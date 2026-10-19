@@ -4,21 +4,11 @@ from sqlalchemy.orm import Session
 
 from app.modelos import Usuario
 from schooldesk_comun.roles import Rol
-
-
-def crear_usuario(usuario: str = "100521347", email: str = "laura.mendez@docente.example.com") -> Usuario:
-    return Usuario(
-        usuario=usuario,
-        nombre="Laura",
-        apellidos="Méndez Ortega",
-        email=email,
-        hash_contrasena="x" * 60,
-        rol=Rol.DOCENTE,
-    )
+from tests.fabricas import nuevo_usuario
 
 
 def test_usuario_se_guarda_con_valores_por_defecto(sesion: Session) -> None:
-    sesion.add(crear_usuario())
+    sesion.add(nuevo_usuario())
     sesion.commit()
 
     guardado = sesion.get(Usuario, "100521347")
@@ -31,16 +21,16 @@ def test_usuario_se_guarda_con_valores_por_defecto(sesion: Session) -> None:
 
 
 def test_email_repetido_se_rechaza(sesion: Session) -> None:
-    sesion.add(crear_usuario(usuario="100521347"))
+    sesion.add(nuevo_usuario(usuario="100521347"))
     sesion.commit()
 
-    sesion.add(crear_usuario(usuario="100534812"))  # otro usuario, mismo email
+    sesion.add(nuevo_usuario(usuario="100534812"))  # otro usuario, mismo email
     with pytest.raises(IntegrityError):
         sesion.commit()
 
 
 def test_usuario_de_mas_de_9_caracteres_se_rechaza(sesion: Session) -> None:
     # SQLite aceptaría este valor; PostgreSQL respeta el String(9).
-    sesion.add(crear_usuario(usuario="1005213470"))
+    sesion.add(nuevo_usuario(usuario="1005213470"))
     with pytest.raises(DataError):
         sesion.commit()

@@ -1,11 +1,26 @@
 from collections.abc import Iterator
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from testcontainers.postgres import PostgresContainer
 
-from app.base_datos import Base
+from app.base_datos import Base, obtener_sesion
+from app.main import app
+from schooldesk_comun.configuracion import obtener_configuracion_comun
+
+CLAVE_JWT_PRUEBA = "clave-jwt-de-prueba"
+
+
+@pytest.fixture(autouse=True)
+def entorno(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
+    """Claves de prueba para cada test (se aplica sola a todas las pruebas)."""
+    monkeypatch.setenv("CLAVE_JWT", CLAVE_JWT_PRUEBA)
+    monkeypatch.setenv("CLAVE_INTERNA", "clave-interna-de-prueba")
+    obtener_configuracion_comun.cache_clear()
+    yield
+    obtener_configuracion_comun.cache_clear()
 
 
 @pytest.fixture(scope="session")
@@ -28,3 +43,15 @@ def sesion(motor: Engine) -> Iterator[Session]:
     with sessionmaker(bind=motor)() as sesion:
         yield sesion
     Base.metadata.drop_all(motor)
+
+
+@pytest.fixture
+def cliente(sesion: Session) -> Iterator[TestClient]:
+    """Cliente HTTP de la API que usa la base de pruebas en lugar de la real.
+
+    dependency_overrides reemplaza la dependencia obtener_sesion: así se
+    prueban las rutas completas sin tocar la configuración del servicio.
+    """
+    app.dependency_overrides[obtener_sesion] = lambda: sesion
+    yield TestClient(app)
+    app.dependency_overrides.clear()
