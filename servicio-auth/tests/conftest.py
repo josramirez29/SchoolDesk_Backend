@@ -8,7 +8,10 @@ from testcontainers.postgres import PostgresContainer
 
 from app.base_datos import Base, obtener_sesion
 from app.main import app
+from app.modelos import Usuario
 from schooldesk_comun.configuracion import obtener_configuracion_comun
+from schooldesk_comun.roles import Rol
+from tests.fabricas import nuevo_usuario
 
 CLAVE_JWT_PRUEBA = "clave-jwt-de-prueba"
 
@@ -55,3 +58,18 @@ def cliente(sesion: Session) -> Iterator[TestClient]:
     app.dependency_overrides[obtener_sesion] = lambda: sesion
     yield TestClient(app)
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def admin(sesion: Session) -> Usuario:
+    """Un admin ya guardado en la base, para las pruebas que lo necesitan."""
+    admin = nuevo_usuario(
+        usuario="100500001",
+        nombre="Admin",
+        apellidos="SchoolDesk",
+        email="admin@example.com",
+        rol=Rol.ADMIN,
+    )
+    sesion.add(admin)
+    sesion.commit()
+    return admin

@@ -4,15 +4,14 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.base_datos import obtener_sesion
+from app.dependencias import solo_admin
 from app.esquemas import UsuarioEdicion, UsuarioNuevo, UsuarioRespuesta
 from app.modelos import Usuario
 from app.servicios import usuarios
 from schooldesk_comun.roles import Rol
-from schooldesk_comun.seguridad import UsuarioActual, requerir_roles
+from schooldesk_comun.seguridad import UsuarioActual
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
-
-solo_admin = requerir_roles(Rol.ADMIN)
 
 
 @router.get("", response_model=list[UsuarioRespuesta])

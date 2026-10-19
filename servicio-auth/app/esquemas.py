@@ -60,3 +60,15 @@ class UsuarioEdicion(BaseModel):
 class CambioContrasena(BaseModel):
     contrasena_actual: str = Field(min_length=1, max_length=72)
     contrasena_nueva: str = Field(min_length=8, max_length=72)
+
+
+class FilaDocente(BaseModel):
+    """Una fila de docentes.csv. Los nombres de los campos son las columnas del archivo."""
+
+    num_empleado: str = Field(pattern=PATRON_IDENTIFICADOR)
+    nombre: str = Field(min_length=1, max_length=100)
+    apellidos: str = Field(min_length=1, max_length=100)
+    email: EmailNormalizado
+
+
+COLUMNAS_DOCENTES = list(FilaDocente.model_fields)

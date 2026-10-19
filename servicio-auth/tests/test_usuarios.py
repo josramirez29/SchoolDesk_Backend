@@ -1,9 +1,7 @@
-import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app.modelos import Usuario
-from schooldesk_comun.roles import Rol
 from tests.fabricas import CONTRASENA_PRUEBA, encabezado_de, nuevo_usuario
 
 DOCENTE_NUEVO = {
@@ -13,20 +11,6 @@ DOCENTE_NUEVO = {
     "email": "ricardo.salinas@docente.example.com",
     "rol": "DOCENTE",
 }
-
-
-@pytest.fixture
-def admin(sesion: Session) -> Usuario:
-    admin = nuevo_usuario(
-        usuario="100500001",
-        nombre="Admin",
-        apellidos="SchoolDesk",
-        email="admin@example.com",
-        rol=Rol.ADMIN,
-    )
-    sesion.add(admin)
-    sesion.commit()
-    return admin
 
 
 def test_admin_crea_docente_que_entra_con_su_numero_de_empleado(
