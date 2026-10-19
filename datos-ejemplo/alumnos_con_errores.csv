@@ -1,0 +1,6 @@
+﻿matricula,nombre,apellidos,email
+202299001,Mario,Prueba Uno,mario.prueba@alumno.example.com
+20229902,Nora,Matrícula Corta,nora.corta@alumno.example.com
+202299003,,Sin Nombre,sin.nombre@alumno.example.com
+202299004,Olga,Email Inválido,olga.sin-arroba
+202299001,Pedro,Matrícula Repetida,pedro.repetida@alumno.example.com
