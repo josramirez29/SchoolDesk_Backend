@@ -4,11 +4,17 @@ Se separan del modelo de la base de datos para no exponer nunca campos
 internos como `hash_contrasena`.
 """
 
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Annotated
+
+from pydantic import AfterValidator, BaseModel, ConfigDict, EmailStr, Field
 
 from schooldesk_comun.roles import Rol
 
 PATRON_IDENTIFICADOR = r"^\d{9}$"  # matrícula o número de empleado BUAP
+
+
+# "Laura.Mendez@..." y "laura.mendez@..." son el mismo correo: se guarda en minúsculas.
+EmailNormalizado = Annotated[EmailStr, AfterValidator(str.lower)]
 
 
 class SolicitudLogin(BaseModel):
@@ -31,3 +37,21 @@ class RespuestaLogin(BaseModel):
     token_acceso: str
     tipo_token: str = "bearer"
     usuario: UsuarioRespuesta
+
+
+class UsuarioNuevo(BaseModel):
+    usuario: str = Field(pattern=PATRON_IDENTIFICADOR, examples=["100521347"])
+    nombre: str = Field(min_length=1, max_length=100)
+    apellidos: str = Field(min_length=1, max_length=100)
+    email: EmailNormalizado
+    rol: Rol
+
+
+class UsuarioEdicion(BaseModel):
+    """Edición parcial: solo se cambian los campos que vengan en la petición."""
+
+    nombre: str | None = Field(default=None, min_length=1, max_length=100)
+    apellidos: str | None = Field(default=None, min_length=1, max_length=100)
+    email: EmailNormalizado | None = None
+    activo: bool | None = None
+    restablecer_contrasena: bool = False
