@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -9,17 +11,26 @@ class ErrorApp(Exception):
 
     Todos los servicios responden los errores con el mismo formato:
     {"error": "CODIGO", "detalle": "mensaje legible"}
+
+    `extra` agrega campos a la respuesta cuando hace falta más información,
+    por ejemplo la lista de filas con error de una importación.
     """
 
-    def __init__(self, codigo_http: int, error: str, detalle: str) -> None:
+    def __init__(
+        self, codigo_http: int, error: str, detalle: str, extra: dict[str, Any] | None = None
+    ) -> None:
         super().__init__(detalle)
         self.codigo_http = codigo_http
         self.error = error
         self.detalle = detalle
+        self.extra = extra or {}
 
 
-def _respuesta_error(codigo_http: int, error: str, detalle: str) -> JSONResponse:
-    return JSONResponse(status_code=codigo_http, content={"error": error, "detalle": detalle})
+def _respuesta_error(
+    codigo_http: int, error: str, detalle: str, extra: dict[str, Any] | None = None
+) -> JSONResponse:
+    contenido = {"error": error, "detalle": detalle, **(extra or {})}
+    return JSONResponse(status_code=codigo_http, content=contenido)
 
 
 def registrar_manejadores_errores(app: FastAPI) -> None:
@@ -27,7 +38,7 @@ def registrar_manejadores_errores(app: FastAPI) -> None:
 
     @app.exception_handler(ErrorApp)
     async def manejar_error_app(_: Request, exc: ErrorApp) -> JSONResponse:
-        return _respuesta_error(exc.codigo_http, exc.error, exc.detalle)
+        return _respuesta_error(exc.codigo_http, exc.error, exc.detalle, exc.extra)
 
     @app.exception_handler(RequestValidationError)
     async def manejar_error_validacion(_: Request, exc: RequestValidationError) -> JSONResponse:
