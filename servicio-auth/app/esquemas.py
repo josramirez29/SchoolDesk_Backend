@@ -55,3 +55,8 @@ class UsuarioEdicion(BaseModel):
     email: EmailNormalizado | None = None
     activo: bool | None = None
     restablecer_contrasena: bool = False
+
+
+class CambioContrasena(BaseModel):
+    contrasena_actual: str = Field(min_length=1, max_length=72)
+    contrasena_nueva: str = Field(min_length=8, max_length=72)

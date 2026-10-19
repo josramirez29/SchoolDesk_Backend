@@ -2,7 +2,7 @@
 
 from sqlalchemy.orm import Session
 
-from app.contrasenas import HASH_FALSO, verificar_contrasena
+from app.contrasenas import HASH_FALSO, generar_hash, verificar_contrasena
 from app.esquemas import RespuestaLogin, UsuarioRespuesta
 from app.modelos import Usuario
 from app.tokens import crear_token
@@ -41,3 +41,24 @@ def obtener_perfil(sesion: Session, usuario: str) -> Usuario:
     if encontrado is None:
         raise ErrorApp(404, "USUARIO_NO_ENCONTRADO", "El usuario no existe")
     return encontrado
+
+
+def cambiar_contrasena(sesion: Session, usuario: str, actual: str, nueva: str) -> None:
+    encontrado = obtener_perfil(sesion, usuario)
+
+    if not verificar_contrasena(actual, encontrado.hash_contrasena):
+        # 422 y no 401: un 401 haría que el frontend cerrara la sesión,
+        # y aquí el usuario sí está autenticado, solo escribió mal su contraseña.
+        raise ErrorApp(422, "CONTRASENA_INCORRECTA", "La contraseña actual no es correcta")
+    if nueva == actual:
+        raise ErrorApp(
+            422, "CONTRASENA_REPETIDA", "La nueva contraseña debe ser distinta a la actual"
+        )
+    if nueva == encontrado.usuario:
+        # La contraseña inicial es la matrícula o el número de empleado, que no son secretos.
+        raise ErrorApp(
+            422, "CONTRASENA_INSEGURA", "La contraseña no puede ser tu matrícula o número de empleado"
+        )
+
+    encontrado.hash_contrasena = generar_hash(nueva)
+    sesion.commit()

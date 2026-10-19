@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.base_datos import obtener_sesion
-from app.esquemas import RespuestaLogin, SolicitudLogin, UsuarioRespuesta
+from app.esquemas import CambioContrasena, RespuestaLogin, SolicitudLogin, UsuarioRespuesta
 from app.modelos import Usuario
 from app.servicios import autenticacion
 from schooldesk_comun.seguridad import UsuarioActual, obtener_usuario_actual
@@ -23,3 +23,14 @@ def perfil(
     sesion: Session = Depends(obtener_sesion),
 ) -> Usuario:
     return autenticacion.obtener_perfil(sesion, actual.usuario)
+
+
+@router.put("/perfil/contrasena", status_code=204)
+def cambiar_contrasena(
+    datos: CambioContrasena,
+    actual: UsuarioActual = Depends(obtener_usuario_actual),
+    sesion: Session = Depends(obtener_sesion),
+) -> None:
+    autenticacion.cambiar_contrasena(
+        sesion, actual.usuario, datos.contrasena_actual, datos.contrasena_nueva
+    )
