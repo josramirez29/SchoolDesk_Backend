@@ -11,6 +11,6 @@ PostgreSQL en un contenedor temporal (testcontainers).
 Desde esta carpeta (`servicio-academico/`):
 
 ```bash
-pip install -e ../comun -r requirements.txt
+pip install -e ../comun -r requirements-pruebas.txt
 pytest
 ```

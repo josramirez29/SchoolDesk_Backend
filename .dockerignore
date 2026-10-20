@@ -1,0 +1,7 @@
+# Lo que nunca debe copiarse a una imagen de Docker.
+.git
+.venv
+.env
+**/__pycache__
+**/.pytest_cache
+**/tests

@@ -1,0 +1,4 @@
+# Dependencias para correr las pruebas (no se instalan en la imagen de Docker).
+-r requirements.txt
+
+pytest==8.3.4

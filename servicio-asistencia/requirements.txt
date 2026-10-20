@@ -8,7 +8,3 @@ email-validator==2.2.0
 pyjwt==2.12.1
 httpx==0.28.1  # para llamar a servicio-academico
 redis==5.2.1  # tokens de QR de un solo uso
-
-# Pruebas
-pytest==8.3.4
-testcontainers[postgres,redis]==4.8.2

@@ -15,6 +15,6 @@ PostgreSQL y Redis en contenedores temporales (testcontainers).
 Desde esta carpeta (`servicio-asistencia/`):
 
 ```bash
-pip install -e ../comun -r requirements.txt
+pip install -e ../comun -r requirements-pruebas.txt
 pytest
 ```

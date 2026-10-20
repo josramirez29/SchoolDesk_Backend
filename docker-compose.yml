@@ -1,0 +1,114 @@
+# Para levantar todo el backend con un solo comando:   docker compose up --build
+# Primero se copia .env.example como .env y cambia las claves.
+#
+
+# Chequeo de salud de los servicios de Python: la imagen "slim" no trae curl,
+# así que se usa Python para pedir /salud.
+x-chequeo-de-salud: &chequeo-de-salud
+  test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/salud')"]
+  interval: 5s
+  timeout: 3s
+  retries: 10
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Falta POSTGRES_USER en .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}
+    volumes:
+      - datos-postgres:/var/lib/postgresql/data  # los datos sobreviven a reinicios
+      - ./docker/postgres/crear-bases.sql:/docker-entrypoint-initdb.d/crear-bases.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  servicio-auth:
+    build:
+      context: .  # la raíz, para que el Dockerfile pueda copiar comun/
+      dockerfile: servicio-auth/Dockerfile
+    environment:
+      CLAVE_JWT: ${CLAVE_JWT:?Falta CLAVE_JWT en .env}
+      CLAVE_INTERNA: ${CLAVE_INTERNA:?Falta CLAVE_INTERNA en .env}
+      URL_BASE_DATOS: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/auth_db
+    depends_on:
+      postgres:
+        condition: service_healthy  # no arranca hasta que PostgreSQL acepte conexiones
+    healthcheck: *chequeo-de-salud
+    ports:
+      - "8001:8000"  # solo para desarrollo: Swagger en http://localhost:8001/docs
+
+  servicio-academico:
+    build:
+      context: .
+      dockerfile: servicio-academico/Dockerfile
+    environment:
+      CLAVE_JWT: ${CLAVE_JWT}
+      CLAVE_INTERNA: ${CLAVE_INTERNA}
+      URL_BASE_DATOS: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/academico_db
+      # Dentro de la red de Docker, cada servicio se encuentra por su nombre.
+      URL_SERVICIO_AUTH: http://servicio-auth:8000
+      URL_SERVICIO_ASISTENCIA: http://servicio-asistencia:8000
+    # Solo depende de su base. Academic y asistencia se llaman entre sí, pero en
+    # cada petición, no al arrancar: si uno esperara al otro, ninguno arrancaría.
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck: *chequeo-de-salud
+    ports:
+      - "8002:8000"  # solo para desarrollo: Swagger en http://localhost:8002/docs
+
+  servicio-asistencia:
+    build:
+      context: .
+      dockerfile: servicio-asistencia/Dockerfile
+    environment:
+      CLAVE_JWT: ${CLAVE_JWT}
+      CLAVE_INTERNA: ${CLAVE_INTERNA}
+      URL_BASE_DATOS: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/asistencia_db
+      URL_REDIS: redis://redis:6379/0
+      URL_SERVICIO_ACADEMICO: http://servicio-academico:8000
+      # En la demo se pueden bajar (p. ej. 2 y 1) para no esperar 10 minutos.
+      MINUTOS_SESION: ${MINUTOS_SESION:-10}
+      MINUTOS_TOLERANCIA: ${MINUTOS_TOLERANCIA:-5}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck: *chequeo-de-salud
+    ports:
+      - "8003:8000"  # solo para desarrollo: Swagger en http://localhost:8003/docs
+
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    environment:
+      URL_SERVICIO_AUTH: http://servicio-auth:8000
+      URL_SERVICIO_ACADEMICO: http://servicio-academico:8000
+      URL_SERVICIO_ASISTENCIA: http://servicio-asistencia:8000
+      ORIGENES_PERMITIDOS: ${ORIGENES_PERMITIDOS:-["http://localhost:4200"]}
+    depends_on:
+      servicio-auth:
+        condition: service_healthy
+      servicio-academico:
+        condition: service_healthy
+      servicio-asistencia:
+        condition: service_healthy
+    healthcheck: *chequeo-de-salud
+    ports:
+      - "8000:8000"  # el único puerto que necesita el frontend
+
+volumes:
+  datos-postgres:

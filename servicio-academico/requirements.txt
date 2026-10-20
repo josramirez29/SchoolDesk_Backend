@@ -8,7 +8,3 @@ email-validator==2.2.0
 pyjwt==2.12.1
 python-multipart==0.0.29
 httpx==0.28.1  # para llamar a servicio-auth y servicio-asistencia
-
-# Pruebas
-pytest==8.3.4
-testcontainers[postgres]==4.8.2

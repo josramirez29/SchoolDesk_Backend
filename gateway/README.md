@@ -15,6 +15,6 @@ no responde y `GET /salud/servicios` para ver el estado de los tres.
 ## Correr las pruebas
 
 ```bash
-pip install -e ../comun -r requirements.txt
+pip install -e ../comun -r requirements-pruebas.txt
 pytest
 ```
