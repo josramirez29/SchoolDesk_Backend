@@ -1,0 +1,14 @@
+# El paquete común se instala aparte (ver README del servicio): pip install -e ../comun
+fastapi==0.136.1
+uvicorn[standard]==0.46.0
+sqlalchemy==2.0.49
+psycopg[binary]==3.2.3
+pydantic-settings==2.6.1
+email-validator==2.2.0
+pyjwt==2.12.1
+python-multipart==0.0.29
+httpx==0.28.1  # para llamar a servicio-auth y servicio-asistencia
+
+# Pruebas
+pytest==8.3.4
+testcontainers[postgres]==4.8.2
