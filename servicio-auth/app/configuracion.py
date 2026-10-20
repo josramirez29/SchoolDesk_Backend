@@ -12,6 +12,9 @@ class ConfiguracionAuth(BaseSettings):
 
     url_base_datos: str = "postgresql+psycopg://schooldesk:schooldesk@localhost:5432/auth_db"
     minutos_expiracion_token: int = 480  # 8 horas: una jornada escolar
+    # Costo de bcrypt: cada ronda más duplica el tiempo. 12 es el valor seguro;
+    # las pruebas usan 4 (el mínimo) para no tardar minutos.
+    rondas_bcrypt: int = 12
 
 
 @lru_cache

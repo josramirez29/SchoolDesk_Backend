@@ -2,7 +2,7 @@
 
 from sqlalchemy.orm import Session
 
-from app.contrasenas import HASH_FALSO, generar_hash, verificar_contrasena
+from app.contrasenas import generar_hash, hash_falso, verificar_contrasena
 from app.esquemas import RespuestaLogin, UsuarioRespuesta
 from app.modelos import Usuario
 from app.tokens import crear_token
@@ -21,7 +21,7 @@ def iniciar_sesion(sesion: Session, usuario: str, contrasena: str) -> RespuestaL
     if encontrado is None:
         # Se verifica contra un hash falso para que la respuesta tarde lo mismo
         # que con un usuario real; si no, el tiempo delataría qué usuarios existen.
-        verificar_contrasena(contrasena, HASH_FALSO)
+        verificar_contrasena(contrasena, hash_falso())
         raise _credenciales_invalidas()
 
     if not verificar_contrasena(contrasena, encontrado.hash_contrasena):

@@ -9,12 +9,13 @@ from testcontainers.postgres import PostgresContainer
 from app.base_datos import Base, obtener_sesion
 from app.main import app
 from app.modelos import Usuario
+from app.configuracion import obtener_configuracion
 from schooldesk_comun.configuracion import obtener_configuracion_comun
 from schooldesk_comun.roles import Rol
 from tests.fabricas import nuevo_usuario
 
-CLAVE_JWT_PRUEBA = "clave-jwt-de-prueba"
-CLAVE_INTERNA_PRUEBA = "clave-interna-de-prueba"
+CLAVE_JWT_PRUEBA = "clave-jwt-de-prueba-con-al-menos-32-bytes"
+CLAVE_INTERNA_PRUEBA = "clave-interna-de-prueba-de-32-bytes"
 
 
 @pytest.fixture(autouse=True)
@@ -22,9 +23,14 @@ def entorno(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     """Claves de prueba para cada test (se aplica sola a todas las pruebas)."""
     monkeypatch.setenv("CLAVE_JWT", CLAVE_JWT_PRUEBA)
     monkeypatch.setenv("CLAVE_INTERNA", CLAVE_INTERNA_PRUEBA)
+    # bcrypt con 4 rondas (el mínimo): las pruebas verifican que el hash funcione,
+    # no su resistencia a ataques, y así no tardan minutos.
+    monkeypatch.setenv("RONDAS_BCRYPT", "4")
     obtener_configuracion_comun.cache_clear()
+    obtener_configuracion.cache_clear()
     yield
     obtener_configuracion_comun.cache_clear()
+    obtener_configuracion.cache_clear()
 
 
 @pytest.fixture(scope="session")

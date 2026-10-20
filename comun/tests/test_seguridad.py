@@ -55,7 +55,7 @@ def test_sin_token_responde_401() -> None:
 
 
 def test_token_firmado_con_otra_clave_responde_401() -> None:
-    token = crear_token(clave="otra-clave")
+    token = crear_token(clave="otra-clave-distinta-tambien-de-32-bytes")
 
     respuesta = crear_cliente().get("/solo-admin", headers=encabezado_auth(token))
 

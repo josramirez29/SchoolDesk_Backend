@@ -4,8 +4,8 @@ import pytest
 
 from schooldesk_comun.configuracion import obtener_configuracion_comun
 
-CLAVE_JWT_PRUEBA = "clave-jwt-de-prueba"
-CLAVE_INTERNA_PRUEBA = "clave-interna-de-prueba"
+CLAVE_JWT_PRUEBA = "clave-jwt-de-prueba-con-al-menos-32-bytes"
+CLAVE_INTERNA_PRUEBA = "clave-interna-de-prueba-de-32-bytes"
 
 
 @pytest.fixture(autouse=True)
