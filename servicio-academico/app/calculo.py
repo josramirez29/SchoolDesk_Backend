@@ -66,3 +66,51 @@ def promedio_final(pesos_y_promedios: list[tuple[Decimal, Decimal]]) -> Decimal 
     # ROUND_HALF_UP: 8.45 → 8.5, como se redondea en la escuela.
     # (Python redondea por defecto al par más cercano: round(8.45, 1) puede dar 8.4.)
     return (ponderado / suma_pesos / 10).quantize(UN_DECIMAL, ROUND_HALF_UP)
+
+
+# --- Asistencia y resumen del grupo (para el reporte de materia) ---
+
+CALIFICACION_APROBATORIA = Decimal("6")  # escala BUAP: 6 o más aprueba
+
+
+@dataclass(frozen=True)
+class Asistencia:
+    presentes: int
+    retardos: int
+    faltas: int
+    porcentaje: Decimal | None  # None si todavía no hay sesiones
+
+
+def calcular_asistencia(total_sesiones: int, presentes: int, retardos: int) -> Asistencia:
+    """Un retardo cuenta como asistencia (el alumno sí llegó); solo las faltas restan."""
+    faltas = max(total_sesiones - presentes - retardos, 0)
+    porcentaje = None
+    if total_sesiones > 0:
+        porcentaje = (Decimal(presentes + retardos) * 100 / total_sesiones).quantize(
+            UN_DECIMAL, ROUND_HALF_UP
+        )
+    return Asistencia(presentes=presentes, retardos=retardos, faltas=faltas, porcentaje=porcentaje)
+
+
+@dataclass(frozen=True)
+class ResumenGrupo:
+    promedio_grupo: Decimal | None
+    aprobados: int
+    reprobados: int
+    sin_calificaciones: int
+
+
+def resumir_grupo(promedios: list[Decimal | None]) -> ResumenGrupo:
+    calificados = [promedio for promedio in promedios if promedio is not None]
+    promedio_grupo = None
+    if calificados:
+        promedio_grupo = (sum(calificados, Decimal("0")) / len(calificados)).quantize(
+            UN_DECIMAL, ROUND_HALF_UP
+        )
+    aprobados = sum(1 for promedio in calificados if promedio >= CALIFICACION_APROBATORIA)
+    return ResumenGrupo(
+        promedio_grupo=promedio_grupo,
+        aprobados=aprobados,
+        reprobados=len(calificados) - aprobados,
+        sin_calificaciones=len(promedios) - len(calificados),
+    )

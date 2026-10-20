@@ -2,7 +2,13 @@
 
 from decimal import Decimal
 
-from app.calculo import CategoriaParaCalculo, calcular_promedios, promedio_final
+from app.calculo import (
+    CategoriaParaCalculo,
+    calcular_asistencia,
+    calcular_promedios,
+    promedio_final,
+    resumir_grupo,
+)
 
 D = Decimal
 
@@ -57,3 +63,24 @@ def test_el_resultado_es_exacto_con_decimales() -> None:
 
     assert promedios.por_categoria[1] == D("80.03")
     assert promedios.final == D("8.0")
+
+
+# --- Asistencia y resumen del grupo ---
+
+
+def test_un_retardo_cuenta_como_asistencia() -> None:
+    asistencia = calcular_asistencia(total_sesiones=10, presentes=7, retardos=1)
+
+    assert asistencia.faltas == 2
+    assert asistencia.porcentaje == D("80.0")
+
+
+def test_sin_sesiones_no_hay_porcentaje() -> None:
+    assert calcular_asistencia(total_sesiones=0, presentes=0, retardos=0).porcentaje is None
+
+
+def test_resumen_del_grupo_con_6_como_minimo_aprobatorio() -> None:
+    resumen = resumir_grupo([D("6.0"), D("5.9"), D("10.0"), None])
+
+    assert (resumen.aprobados, resumen.reprobados, resumen.sin_calificaciones) == (2, 1, 1)
+    assert resumen.promedio_grupo == D("7.3")  # (6 + 5.9 + 10) / 3 = 7.3

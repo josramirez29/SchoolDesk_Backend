@@ -180,3 +180,47 @@ class FilaInscripcion(BaseModel):
 COLUMNAS_ALUMNOS = list(AlumnoNuevo.model_fields)
 COLUMNAS_MATERIAS = list(MateriaNueva.model_fields)
 COLUMNAS_INSCRIPCIONES = list(FilaInscripcion.model_fields)
+
+
+# --- Reporte de materia ---
+
+
+class AsistenciaReporte(BaseModel):
+    presentes: int
+    retardos: int
+    faltas: int
+    porcentaje: DecimalJson | None
+
+
+class FilaReporte(BaseModel):
+    matricula: str
+    nombre: str
+    apellidos: str
+    promedio: DecimalJson | None
+    asistencia: AsistenciaReporte | None  # None si servicio-asistencia no respondió
+
+
+class ResumenGrupoReporte(BaseModel):
+    promedio_grupo: DecimalJson | None
+    aprobados: int
+    reprobados: int
+    sin_calificaciones: int
+
+
+class ReporteMateria(BaseModel):
+    materia: MateriaRespuesta
+    asistencia_disponible: bool
+    total_sesiones: int | None
+    resumen: ResumenGrupoReporte
+    alumnos: list[FilaReporte]
+
+
+# --- Endpoints internos (los usa servicio-asistencia) ---
+
+
+class MateriaInterna(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    nrc: str
+    nombre: str
+    num_empleado_docente: str

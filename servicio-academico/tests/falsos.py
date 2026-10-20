@@ -4,6 +4,7 @@ Reemplazan al cliente real en las pruebas: no hacen llamadas HTTP, guardan lo
 que se les pidió (para verificarlo) y se les puede indicar que fallen.
 """
 
+from app.clientes.asistencia import ClienteAsistencia, ResumenAsistencia
 from app.clientes.auth import ClienteAuth, CuentaAlumno, Docente, ResultadoLote
 from schooldesk_comun.errores import ErrorApp
 
@@ -37,3 +38,14 @@ class ClienteAuthFalso(ClienteAuth):
     def _fallar_si_se_pidio(self) -> None:
         if self.error is not None:
             raise self.error
+
+
+class ClienteAsistenciaFalso(ClienteAsistencia):
+    def __init__(self) -> None:  # no llama a super(): no necesita conexión HTTP
+        self.resumen = ResumenAsistencia(total_sesiones=0, alumnos={})
+        self.error: ErrorApp | None = None  # si se asigna, cada llamada lo lanza
+
+    def obtener_resumen(self, nrc: str) -> ResumenAsistencia:
+        if self.error is not None:
+            raise self.error
+        return self.resumen

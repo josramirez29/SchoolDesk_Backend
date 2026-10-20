@@ -8,10 +8,10 @@ from testcontainers.postgres import PostgresContainer
 
 from app import modelos  # noqa: F401  (registra las tablas en Base.metadata)
 from app.base_datos import Base, obtener_sesion
-from app.dependencias import obtener_cliente_auth
+from app.dependencias import obtener_cliente_asistencia, obtener_cliente_auth
 from app.main import app
 from schooldesk_comun.configuracion import obtener_configuracion_comun
-from tests.falsos import ClienteAuthFalso
+from tests.falsos import ClienteAsistenciaFalso, ClienteAuthFalso
 
 CLAVE_JWT_PRUEBA = "clave-jwt-de-prueba"
 CLAVE_INTERNA_PRUEBA = "clave-interna-de-prueba"
@@ -51,9 +51,17 @@ def auth_falso() -> ClienteAuthFalso:
 
 
 @pytest.fixture
-def cliente(sesion: Session, auth_falso: ClienteAuthFalso) -> Iterator[TestClient]:
-    """Cliente HTTP de la API con la base de pruebas y el cliente de auth falso."""
+def asistencia_falso() -> ClienteAsistenciaFalso:
+    return ClienteAsistenciaFalso()
+
+
+@pytest.fixture
+def cliente(
+    sesion: Session, auth_falso: ClienteAuthFalso, asistencia_falso: ClienteAsistenciaFalso
+) -> Iterator[TestClient]:
+    """Cliente HTTP de la API con la base de pruebas y clientes falsos de los otros servicios."""
     app.dependency_overrides[obtener_sesion] = lambda: sesion
     app.dependency_overrides[obtener_cliente_auth] = lambda: auth_falso
+    app.dependency_overrides[obtener_cliente_asistencia] = lambda: asistencia_falso
     yield TestClient(app)
     app.dependency_overrides.clear()

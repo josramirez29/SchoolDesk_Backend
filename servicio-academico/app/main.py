@@ -9,9 +9,11 @@ from app.rutas import (
     alumnos,
     calificaciones,
     importacion,
+    interno,
     materias,
     mis_materias,
     ponderaciones,
+    reportes,
 )
 from schooldesk_comun.errores import registrar_manejadores_errores
 
@@ -32,6 +34,8 @@ app.include_router(ponderaciones.router)
 app.include_router(calificaciones.router)
 app.include_router(mis_materias.router)
 app.include_router(importacion.router)
+app.include_router(reportes.router)
+app.include_router(interno.router)
 
 
 @app.get("/salud", tags=["Salud"])
