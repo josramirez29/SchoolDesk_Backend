@@ -72,3 +72,31 @@ class FilaDocente(BaseModel):
 
 
 COLUMNAS_DOCENTES = list(FilaDocente.model_fields)
+
+
+# --- Endpoints internos (solo los llaman otros servicios) ---
+
+
+class CuentaNueva(BaseModel):
+    usuario: str = Field(pattern=PATRON_IDENTIFICADOR)
+    nombre: str = Field(min_length=1, max_length=100)
+    apellidos: str = Field(min_length=1, max_length=100)
+    email: EmailNormalizado
+
+
+class SolicitudLoteAlumnos(BaseModel):
+    cuentas: list[CuentaNueva] = Field(min_length=1, max_length=2000)
+
+
+class RespuestaLote(BaseModel):
+    creados: list[str]
+    omitidos: list[str]  # ya existían; se reportan para que la operación sea repetible
+
+
+class DocenteResumen(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    usuario: str
+    nombre: str
+    apellidos: str
+    email: str

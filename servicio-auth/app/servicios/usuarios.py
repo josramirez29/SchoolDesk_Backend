@@ -1,10 +1,10 @@
-"""Administración de cuentas (solo el admin llega aquí)."""
+"""Administración de cuentas: la usan las rutas del admin, la importación y las rutas internas."""
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.contrasenas import generar_hash
-from app.esquemas import UsuarioEdicion, UsuarioNuevo
+from app.contrasenas import generar_hash, generar_hashes
+from app.esquemas import CuentaNueva, UsuarioEdicion, UsuarioNuevo
 from app.modelos import Usuario
 from schooldesk_comun.errores import ErrorApp
 from schooldesk_comun.roles import Rol
@@ -89,3 +89,35 @@ def _validar_no_es_uno_mismo(usuario: str, quien_hace: str) -> None:
     # Evita que el admin se quede fuera del sistema por accidente.
     if usuario == quien_hace:
         raise ErrorApp(409, "AUTODESACTIVACION", "No puedes desactivar tu propia cuenta")
+
+
+# --- Funciones para crear muchas cuentas a la vez (importación y endpoints internos) ---
+
+
+def usuarios_existentes(sesion: Session, usuarios: list[str]) -> dict[str, Usuario]:
+    encontrados = sesion.scalars(select(Usuario).where(Usuario.usuario.in_(usuarios)))
+    return {encontrado.usuario: encontrado for encontrado in encontrados}
+
+
+def emails_en_uso(sesion: Session, emails: list[str]) -> set[str]:
+    return set(sesion.scalars(select(Usuario.email).where(Usuario.email.in_(emails))))
+
+
+def guardar_cuentas_nuevas(sesion: Session, cuentas: list[CuentaNueva], rol: Rol) -> None:
+    """Guarda todas las cuentas en una sola transacción: se guardan todas o ninguna.
+
+    La contraseña inicial de cada cuenta es su usuario (matrícula o número de empleado).
+    """
+    hashes = generar_hashes([cuenta.usuario for cuenta in cuentas])
+    sesion.add_all(
+        Usuario(
+            usuario=cuenta.usuario,
+            nombre=cuenta.nombre,
+            apellidos=cuenta.apellidos,
+            email=cuenta.email,
+            hash_contrasena=hash_contrasena,
+            rol=rol,
+        )
+        for cuenta, hash_contrasena in zip(cuentas, hashes)
+    )
+    sesion.commit()

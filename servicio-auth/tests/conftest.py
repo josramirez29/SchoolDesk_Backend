@@ -14,13 +14,14 @@ from schooldesk_comun.roles import Rol
 from tests.fabricas import nuevo_usuario
 
 CLAVE_JWT_PRUEBA = "clave-jwt-de-prueba"
+CLAVE_INTERNA_PRUEBA = "clave-interna-de-prueba"
 
 
 @pytest.fixture(autouse=True)
 def entorno(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     """Claves de prueba para cada test (se aplica sola a todas las pruebas)."""
     monkeypatch.setenv("CLAVE_JWT", CLAVE_JWT_PRUEBA)
-    monkeypatch.setenv("CLAVE_INTERNA", "clave-interna-de-prueba")
+    monkeypatch.setenv("CLAVE_INTERNA", CLAVE_INTERNA_PRUEBA)
     obtener_configuracion_comun.cache_clear()
     yield
     obtener_configuracion_comun.cache_clear()
