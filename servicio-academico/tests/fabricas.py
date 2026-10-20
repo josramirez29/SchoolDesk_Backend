@@ -54,3 +54,5 @@ def encabezado_de(rol: Rol, usuario: str = "100500001", nombre: str = "Admin Sch
 
 ADMIN = encabezado_de(Rol.ADMIN)
 DOCENTE = encabezado_de(Rol.DOCENTE, usuario="100521347", nombre="Laura Méndez Ortega")
+OTRO_DOCENTE = encabezado_de(Rol.DOCENTE, usuario="100534812", nombre="Ricardo Salinas Pérez")
+ALUMNO = encabezado_de(Rol.ALUMNO, usuario="202231045", nombre="Ana Sofía Acosta Bravo")

@@ -4,7 +4,7 @@ Reemplazan al cliente real en las pruebas: no hacen llamadas HTTP, guardan lo
 que se les pidió (para verificarlo) y se les puede indicar que fallen.
 """
 
-from app.clientes.auth import ClienteAuth, CuentaAlumno, ResultadoLote
+from app.clientes.auth import ClienteAuth, CuentaAlumno, Docente, ResultadoLote
 from schooldesk_comun.errores import ErrorApp
 
 
@@ -13,6 +13,11 @@ class ClienteAuthFalso(ClienteAuth):
         self.cuentas_creadas: list[CuentaAlumno] = []
         self.nombres_actualizados: list[tuple[str, str, str]] = []
         self.error: ErrorApp | None = None  # si se asigna, cada llamada lo lanza
+        # Los docentes de datos-ejemplo/docentes.csv que usan las pruebas.
+        self.docentes = [
+            Docente(usuario="100521347", nombre="Laura", apellidos="Méndez Ortega"),
+            Docente(usuario="100534812", nombre="Ricardo", apellidos="Salinas Pérez"),
+        ]
 
     def crear_cuentas_alumnos(self, cuentas: list[CuentaAlumno]) -> ResultadoLote:
         self._fallar_si_se_pidio()
@@ -22,6 +27,10 @@ class ClienteAuthFalso(ClienteAuth):
     def actualizar_nombre(self, usuario: str, nombre: str, apellidos: str) -> None:
         self._fallar_si_se_pidio()
         self.nombres_actualizados.append((usuario, nombre, apellidos))
+
+    def listar_docentes(self) -> list[Docente]:
+        self._fallar_si_se_pidio()
+        return self.docentes
 
     def _fallar_si_se_pidio(self) -> None:
         if self.error is not None:

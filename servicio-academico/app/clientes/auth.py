@@ -28,6 +28,16 @@ class ResultadoLote(BaseModel):
     omitidos: list[str]
 
 
+class Docente(BaseModel):
+    usuario: str
+    nombre: str
+    apellidos: str
+
+    @property
+    def nombre_completo(self) -> str:
+        return f"{self.nombre} {self.apellidos}"
+
+
 class ClienteAuth:
     def __init__(
         self,
@@ -51,6 +61,11 @@ class ClienteAuth:
     def actualizar_nombre(self, usuario: str, nombre: str, apellidos: str) -> None:
         cuerpo = {"nombre": nombre, "apellidos": apellidos}
         self._enviar("PATCH", f"/interno/usuarios/{usuario}/nombre", json=cuerpo)
+
+    def listar_docentes(self) -> list[Docente]:
+        """Docentes activos. Se usa para validar al docente titular de una materia."""
+        respuesta = self._enviar("GET", "/interno/docentes")
+        return [Docente.model_validate(docente) for docente in respuesta.json()]
 
     def _enviar(self, metodo: str, ruta: str, **opciones: object) -> httpx.Response:
         try:
