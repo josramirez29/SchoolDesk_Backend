@@ -3,9 +3,15 @@
 Usan los mismos datos de datos-ejemplo/ para que las pruebas se parezcan a la demo.
 """
 
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
+import jwt
+
 from app.modelos import Alumno, Materia
+from schooldesk_comun.roles import Rol
+from schooldesk_comun.seguridad import ALGORITMO_JWT
+from tests.conftest import CLAVE_JWT_PRUEBA
 
 
 def nuevo_alumno(**cambios: Any) -> Alumno:
@@ -29,3 +35,22 @@ def nueva_materia(**cambios: Any) -> Materia:
     }
     datos.update(cambios)
     return Materia(**datos)
+
+
+def encabezado_de(rol: Rol, usuario: str = "100500001", nombre: str = "Admin SchoolDesk") -> dict[str, str]:
+    """Header Authorization con un token firmado como lo haría servicio-auth.
+
+    Academic no tiene tabla de usuarios: le basta con validar el token.
+    """
+    datos = {
+        "sub": usuario,
+        "nombre": nombre,
+        "rol": rol.value,
+        "exp": datetime.now(UTC) + timedelta(hours=1),  # dura toda la corrida de pruebas
+    }
+    token = jwt.encode(datos, CLAVE_JWT_PRUEBA, algorithm=ALGORITMO_JWT)
+    return {"Authorization": f"Bearer {token}"}
+
+
+ADMIN = encabezado_de(Rol.ADMIN)
+DOCENTE = encabezado_de(Rol.DOCENTE, usuario="100521347", nombre="Laura Méndez Ortega")

@@ -1,13 +1,17 @@
 from collections.abc import Iterator
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from testcontainers.postgres import PostgresContainer
 
 from app import modelos  # noqa: F401  (registra las tablas en Base.metadata)
-from app.base_datos import Base
+from app.base_datos import Base, obtener_sesion
+from app.dependencias import obtener_cliente_auth
+from app.main import app
 from schooldesk_comun.configuracion import obtener_configuracion_comun
+from tests.falsos import ClienteAuthFalso
 
 CLAVE_JWT_PRUEBA = "clave-jwt-de-prueba"
 CLAVE_INTERNA_PRUEBA = "clave-interna-de-prueba"
@@ -39,3 +43,17 @@ def sesion(motor: Engine) -> Iterator[Session]:
     with sessionmaker(bind=motor)() as sesion:
         yield sesion
     Base.metadata.drop_all(motor)
+
+
+@pytest.fixture
+def auth_falso() -> ClienteAuthFalso:
+    return ClienteAuthFalso()
+
+
+@pytest.fixture
+def cliente(sesion: Session, auth_falso: ClienteAuthFalso) -> Iterator[TestClient]:
+    """Cliente HTTP de la API con la base de pruebas y el cliente de auth falso."""
+    app.dependency_overrides[obtener_sesion] = lambda: sesion
+    app.dependency_overrides[obtener_cliente_auth] = lambda: auth_falso
+    yield TestClient(app)
+    app.dependency_overrides.clear()
