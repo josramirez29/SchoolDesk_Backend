@@ -111,3 +111,30 @@ class CategoriaRespuesta(BaseModel):
 
 class TareaEntrada(BaseModel):
     nombre: str = Field(min_length=1, max_length=100)
+
+
+# --- Calificaciones ---
+
+
+class CalificacionEntrada(BaseModel):
+    """Una celda del concentrado. `puntos: null` regresa la tarea a "sin calificar"."""
+
+    matricula: Identificador
+    tarea_id: int
+    puntos: Decimal | None = Field(ge=0, le=100, decimal_places=2)
+
+
+class FilaConcentrado(BaseModel):
+    """Un alumno en el concentrado. Las llaves de los diccionarios son ids de tarea/categoría."""
+
+    matricula: str
+    nombre: str
+    apellidos: str
+    puntos: dict[int, DecimalJson | None]
+    promedios_categoria: dict[int, DecimalJson | None]
+    promedio: DecimalJson | None  # escala 0–10
+
+
+class Concentrado(BaseModel):
+    categorias: list[CategoriaRespuesta]  # las columnas
+    alumnos: list[FilaConcentrado]  # las filas
