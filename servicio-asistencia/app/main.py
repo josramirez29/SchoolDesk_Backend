@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 from app import modelos  # noqa: F401  (registra las tablas en Base.metadata)
 from app.base_datos import Base, motor
-from app.rutas import qr, sesiones
+from app.rutas import interno, mi_asistencia, qr, sesiones
 from schooldesk_comun.errores import registrar_manejadores_errores
 
 
@@ -21,6 +21,8 @@ app = FastAPI(title="SchoolDesk · servicio-asistencia", lifespan=ciclo_de_vida)
 registrar_manejadores_errores(app)
 app.include_router(sesiones.router)
 app.include_router(qr.router)
+app.include_router(mi_asistencia.router)
+app.include_router(interno.router)
 
 
 @app.get("/salud", tags=["Salud"])

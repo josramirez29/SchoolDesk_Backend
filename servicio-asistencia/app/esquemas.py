@@ -1,6 +1,7 @@
 """Formato de los datos que entran y salen de la API (DTOs)."""
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -63,3 +64,37 @@ class DatosQr(BaseModel):
     sesion_id: int
     matricula: str
     nombre: str
+
+
+# --- Asistencia del alumno ---
+
+
+class AsistenciaDeSesion(BaseModel):
+    sesion_id: int
+    iniciada_en: datetime
+    # FALTA: la sesión terminó y no hay registro.
+    # EN_CURSO: la sesión sigue abierta y el alumno todavía puede registrarse.
+    estado: Literal["PRESENTE", "RETARDO", "FALTA", "EN_CURSO"]
+
+
+class MiAsistencia(BaseModel):
+    nrc: str
+    presentes: int
+    retardos: int
+    faltas: int
+    sesiones: list[AsistenciaDeSesion]  # de la más reciente a la más antigua
+
+
+# --- Endpoints internos (los usa servicio-academico para el reporte) ---
+
+
+class AsistenciaDeAlumno(BaseModel):
+    presentes: int
+    retardos: int
+
+
+class ResumenMateria(BaseModel):
+    """Mismo formato que espera ResumenAsistencia en el cliente de academic."""
+
+    total_sesiones: int  # solo las que ya terminaron
+    alumnos: dict[str, AsistenciaDeAlumno]  # solo quien asistió al menos una vez
