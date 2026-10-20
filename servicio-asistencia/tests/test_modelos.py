@@ -45,31 +45,31 @@ def test_presente_hasta_los_5_minutos_y_despues_retardo(minuto: float, estado: E
 # --- Base de datos ---
 
 
-def test_un_alumno_no_puede_registrarse_dos_veces_en_la_misma_sesion(sesion: Session) -> None:
-    sesion_asistencia = nueva_sesion()
-    sesion.add(sesion_asistencia)
-    sesion.flush()
+def test_un_alumno_no_puede_registrarse_dos_veces_en_la_misma_sesion(bd: Session) -> None:
+    sesion = nueva_sesion()
+    bd.add(sesion)
+    bd.flush()
 
     def registro() -> Registro:
         return Registro(
-            sesion_id=sesion_asistencia.id,
+            sesion_id=sesion.id,
             matricula="202231045",
             nombre_alumno="Ana Sofía Acosta Bravo",
             estado=EstadoAsistencia.PRESENTE,
             registrado_en=minutos_despues(1),
         )
 
-    sesion.add(registro())
-    sesion.commit()
+    bd.add(registro())
+    bd.commit()
 
-    sesion.add(registro())
+    bd.add(registro())
     with pytest.raises(IntegrityError):
-        sesion.commit()
+        bd.commit()
 
 
-def test_registros_se_ordenan_por_hora_de_llegada(sesion: Session) -> None:
-    sesion_asistencia = nueva_sesion()
-    sesion_asistencia.registros.extend(
+def test_registros_se_ordenan_por_hora_de_llegada(bd: Session) -> None:
+    sesion = nueva_sesion()
+    sesion.registros.extend(
         [
             Registro(
                 matricula="202233918",
@@ -85,8 +85,8 @@ def test_registros_se_ordenan_por_hora_de_llegada(sesion: Session) -> None:
             ),
         ]
     )
-    sesion.add(sesion_asistencia)
-    sesion.commit()
-    sesion.expire_all()  # vuelve a leer de la base, con el orden de la relación
+    bd.add(sesion)
+    bd.commit()
+    bd.expire_all()  # vuelve a leer de la base, con el orden de la relación
 
-    assert [r.matricula for r in sesion_asistencia.registros] == ["202231045", "202233918"]
+    assert [r.matricula for r in sesion.registros] == ["202231045", "202233918"]

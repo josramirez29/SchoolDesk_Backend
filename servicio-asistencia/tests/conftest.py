@@ -1,16 +1,19 @@
 from collections.abc import Iterator
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from testcontainers.postgres import PostgresContainer
 
 from app import modelos  # noqa: F401  (registra las tablas en Base.metadata)
-from app.base_datos import Base
+from app.base_datos import Base, obtener_bd
+from app.dependencias import obtener_cliente_academico
+from app.main import app
+from app.reloj import obtener_ahora
 from schooldesk_comun.configuracion import obtener_configuracion_comun
-
-CLAVE_JWT_PRUEBA = "clave-jwt-de-prueba"
-CLAVE_INTERNA_PRUEBA = "clave-interna-de-prueba"
+from tests.claves import CLAVE_INTERNA_PRUEBA, CLAVE_JWT_PRUEBA
+from tests.falsos import ClienteAcademicoFalso, RelojFalso
 
 
 @pytest.fixture(autouse=True)
@@ -33,9 +36,32 @@ def motor() -> Iterator[Engine]:
 
 
 @pytest.fixture
-def sesion(motor: Engine) -> Iterator[Session]:
+def bd(motor: Engine) -> Iterator[Session]:
     """Tablas nuevas y vacías para cada prueba, para que no se afecten entre sí."""
     Base.metadata.create_all(motor)
-    with sessionmaker(bind=motor)() as sesion:
-        yield sesion
+    with sessionmaker(bind=motor)() as bd:
+        yield bd
     Base.metadata.drop_all(motor)
+
+
+@pytest.fixture
+def academico_falso() -> ClienteAcademicoFalso:
+    return ClienteAcademicoFalso()
+
+
+@pytest.fixture
+def reloj() -> RelojFalso:
+    return RelojFalso()
+
+
+@pytest.fixture
+def cliente(
+    bd: Session, academico_falso: ClienteAcademicoFalso, reloj: RelojFalso
+) -> Iterator[TestClient]:
+    """Cliente HTTP de la API con la base de pruebas, academic falso y reloj falso."""
+    app.dependency_overrides[obtener_bd] = lambda: bd
+    app.dependency_overrides[obtener_cliente_academico] = lambda: academico_falso
+    app.dependency_overrides[obtener_ahora] = lambda: reloj.ahora
+    yield TestClient(app)
+    app.dependency_overrides.clear()
+
