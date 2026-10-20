@@ -20,9 +20,7 @@ DIA = 24 * 60  # minutos
 CLAVE = {"X-Clave-Interna": CLAVE_INTERNA_PRUEBA}
 
 
-def sesion_con(
-    inicio: float, registros: dict[str, EstadoAsistencia], nrc: str = "48308"
-) -> Sesion:
+def sesion_con(inicio: float, registros: dict[str, EstadoAsistencia], nrc: str = "48308") -> Sesion:
     sesion = nueva_sesion(
         nrc=nrc, iniciada_en=minutos_despues(inicio), termina_en=minutos_despues(inicio + 10)
     )
@@ -94,7 +92,9 @@ def test_alumno_no_inscrito_responde_404(cliente: TestClient) -> None:
 
 
 def test_un_docente_no_usa_la_ruta_del_alumno(cliente: TestClient) -> None:
-    assert cliente.get("/mi-asistencia", params={"nrc": "48308"}, headers=DOCENTE).status_code == 403
+    assert (
+        cliente.get("/mi-asistencia", params={"nrc": "48308"}, headers=DOCENTE).status_code == 403
+    )
 
 
 # --- /interno/materias/{nrc}/resumen ---

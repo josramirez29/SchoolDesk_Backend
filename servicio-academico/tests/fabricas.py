@@ -37,7 +37,9 @@ def nueva_materia(**cambios: Any) -> Materia:
     return Materia(**datos)
 
 
-def encabezado_de(rol: Rol, usuario: str = "100500001", nombre: str = "Admin SchoolDesk") -> dict[str, str]:
+def encabezado_de(
+    rol: Rol, usuario: str = "100500001", nombre: str = "Admin SchoolDesk"
+) -> dict[str, str]:
     """Header Authorization con un token firmado como lo haría servicio-auth.
 
     Academic no tiene tabla de usuarios: le basta con validar el token.

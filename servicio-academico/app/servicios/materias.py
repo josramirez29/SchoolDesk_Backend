@@ -104,7 +104,9 @@ def inscribir(sesion: Session, nrc: str, matricula: str) -> Alumno:
     obtener_materia(sesion, nrc)
     alumno = obtener_alumno(sesion, matricula)
     if sesion.get(Inscripcion, (nrc, matricula)) is not None:
-        raise ErrorApp(409, "YA_INSCRITO", f"El alumno {matricula} ya está inscrito en la materia {nrc}")
+        raise ErrorApp(
+            409, "YA_INSCRITO", f"El alumno {matricula} ya está inscrito en la materia {nrc}"
+        )
 
     sesion.add(Inscripcion(nrc=nrc, matricula=matricula))
     sesion.commit()
@@ -114,11 +116,15 @@ def inscribir(sesion: Session, nrc: str, matricula: str) -> Alumno:
 def dar_de_baja(sesion: Session, nrc: str, matricula: str) -> None:
     inscripcion = sesion.get(Inscripcion, (nrc, matricula))
     if inscripcion is None:
-        raise ErrorApp(404, "NO_INSCRITO", f"El alumno {matricula} no está inscrito en la materia {nrc}")
+        raise ErrorApp(
+            404, "NO_INSCRITO", f"El alumno {matricula} no está inscrito en la materia {nrc}"
+        )
     if tiene_calificaciones(sesion, nrc, matricula):
         # Borrar la inscripción dejaría calificaciones huérfanas.
         raise ErrorApp(
-            409, "ALUMNO_CON_CALIFICACIONES", "No se puede dar de baja a un alumno que ya tiene calificaciones"
+            409,
+            "ALUMNO_CON_CALIFICACIONES",
+            "No se puede dar de baja a un alumno que ya tiene calificaciones",
         )
     sesion.delete(inscripcion)
     sesion.commit()
@@ -140,5 +146,7 @@ def buscar_docente(cliente_auth: ClienteAuth, num_empleado: str) -> Docente:
         if docente.usuario == num_empleado:
             return docente
     raise ErrorApp(
-        422, "DOCENTE_NO_ENCONTRADO", f"No hay un docente activo con número de empleado {num_empleado}"
+        422,
+        "DOCENTE_NO_ENCONTRADO",
+        f"No hay un docente activo con número de empleado {num_empleado}",
     )

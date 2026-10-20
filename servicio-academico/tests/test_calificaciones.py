@@ -30,7 +30,9 @@ def materia(sesion: Session) -> Materia:
         ]
     )
     sesion.flush()
-    sesion.add_all([Inscripcion(nrc="48308", matricula=ANA), Inscripcion(nrc="48308", matricula=BRUNO)])
+    sesion.add_all(
+        [Inscripcion(nrc="48308", matricula=ANA), Inscripcion(nrc="48308", matricula=BRUNO)]
+    )
     sesion.commit()
     return materia
 
@@ -40,7 +42,9 @@ def tareas(materia: Materia) -> tuple[int, int, int]:
     return practica_1, practica_2, materia.categorias[1].tareas[0].id
 
 
-def test_capturar_y_ver_el_promedio_en_el_concentrado(cliente: TestClient, materia: Materia) -> None:
+def test_capturar_y_ver_el_promedio_en_el_concentrado(
+    cliente: TestClient, materia: Materia
+) -> None:
     practica_1, practica_2, parcial = tareas(materia)
     entradas = [
         {"matricula": ANA, "tarea_id": practica_1, "puntos": 100},
@@ -70,7 +74,9 @@ def test_alumno_sin_calificaciones_aparece_con_promedio_null(
 
 def test_editar_una_calificacion_existente(cliente: TestClient, materia: Materia) -> None:
     practica_1, _, _ = tareas(materia)
-    cliente.put(RUTA, json=[{"matricula": ANA, "tarea_id": practica_1, "puntos": 60}], headers=DOCENTE)
+    cliente.put(
+        RUTA, json=[{"matricula": ANA, "tarea_id": practica_1, "puntos": 60}], headers=DOCENTE
+    )
 
     respuesta = cliente.put(
         RUTA, json=[{"matricula": ANA, "tarea_id": practica_1, "puntos": 95.5}], headers=DOCENTE
@@ -83,7 +89,9 @@ def test_puntos_null_regresa_a_sin_calificar(
     cliente: TestClient, sesion: Session, materia: Materia
 ) -> None:
     practica_1, _, _ = tareas(materia)
-    cliente.put(RUTA, json=[{"matricula": ANA, "tarea_id": practica_1, "puntos": 90}], headers=DOCENTE)
+    cliente.put(
+        RUTA, json=[{"matricula": ANA, "tarea_id": practica_1, "puntos": 90}], headers=DOCENTE
+    )
 
     respuesta = cliente.put(
         RUTA, json=[{"matricula": ANA, "tarea_id": practica_1, "puntos": None}], headers=DOCENTE

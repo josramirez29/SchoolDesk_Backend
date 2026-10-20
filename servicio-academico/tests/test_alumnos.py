@@ -20,7 +20,11 @@ def test_alta_crea_la_cuenta_en_auth_y_el_registro_academico(
     respuesta = cliente.post("/alumnos", json=ANA, headers=ADMIN)
 
     assert respuesta.status_code == 201
-    assert respuesta.json() == {"matricula": "202231045", "nombre": "Ana Sofía", "apellidos": "Acosta Bravo"}
+    assert respuesta.json() == {
+        "matricula": "202231045",
+        "nombre": "Ana Sofía",
+        "apellidos": "Acosta Bravo",
+    }
     assert sesion.get(Alumno, "202231045") is not None
     # A auth le llega el email (ya en minúsculas); academic no lo guarda.
     assert auth_falso.cuentas_creadas[0].email == "ana.acosta@alumno.example.com"
@@ -41,7 +45,10 @@ def test_error_de_negocio_de_auth_llega_al_admin(
     cliente: TestClient, sesion: Session, auth_falso: ClienteAuthFalso
 ) -> None:
     auth_falso.error = ErrorApp(
-        409, "EMAIL_EN_USO", "Algunos correos ya pertenecen a otra cuenta", {"emails": ["ana.acosta@alumno.example.com"]}
+        409,
+        "EMAIL_EN_USO",
+        "Algunos correos ya pertenecen a otra cuenta",
+        {"emails": ["ana.acosta@alumno.example.com"]},
     )
 
     respuesta = cliente.post("/alumnos", json=ANA, headers=ADMIN)
@@ -94,11 +101,15 @@ def test_editar_el_nombre_lo_sincroniza_con_auth(
     sesion.add(nuevo_alumno())
     sesion.commit()
 
-    respuesta = cliente.patch("/alumnos/202231045", json={"apellidos": "Acosta Bravo de la Cruz"}, headers=ADMIN)
+    respuesta = cliente.patch(
+        "/alumnos/202231045", json={"apellidos": "Acosta Bravo de la Cruz"}, headers=ADMIN
+    )
 
     assert respuesta.status_code == 200
     assert respuesta.json()["apellidos"] == "Acosta Bravo de la Cruz"
-    assert auth_falso.nombres_actualizados == [("202231045", "Ana Sofía", "Acosta Bravo de la Cruz")]
+    assert auth_falso.nombres_actualizados == [
+        ("202231045", "Ana Sofía", "Acosta Bravo de la Cruz")
+    ]
 
 
 def test_si_auth_falla_al_editar_el_nombre_no_cambia(

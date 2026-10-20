@@ -26,7 +26,9 @@ def resumen_de_materia(bd: Session, nrc: str, ahora: datetime) -> ResumenMateria
     alumnos: dict[str, AsistenciaDeAlumno] = {}
     for sesion in terminadas:
         for registro in sesion.registros:
-            conteo = alumnos.setdefault(registro.matricula, AsistenciaDeAlumno(presentes=0, retardos=0))
+            conteo = alumnos.setdefault(
+                registro.matricula, AsistenciaDeAlumno(presentes=0, retardos=0)
+            )
             if registro.estado == EstadoAsistencia.PRESENTE:
                 conteo.presentes += 1
             else:

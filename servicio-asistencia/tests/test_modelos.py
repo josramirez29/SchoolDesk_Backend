@@ -38,7 +38,9 @@ def test_segundos_restantes() -> None:
         (9.9, EstadoAsistencia.RETARDO),
     ],
 )
-def test_presente_hasta_los_5_minutos_y_despues_retardo(minuto: float, estado: EstadoAsistencia) -> None:
+def test_presente_hasta_los_5_minutos_y_despues_retardo(
+    minuto: float, estado: EstadoAsistencia
+) -> None:
     assert nueva_sesion().estado_para(minutos_despues(minuto), minutos_tolerancia=5) == estado
 
 

@@ -25,7 +25,9 @@ def guardar(sesion: Session, *objetos: object) -> None:
 # --- Materias ---
 
 
-def test_alta_valida_al_docente_en_auth_y_guarda_su_nombre(cliente: TestClient, sesion: Session) -> None:
+def test_alta_valida_al_docente_en_auth_y_guarda_su_nombre(
+    cliente: TestClient, sesion: Session
+) -> None:
     respuesta = cliente.post("/materias", json=SITIOS_WEB, headers=ADMIN)
 
     assert respuesta.status_code == 201
@@ -34,7 +36,9 @@ def test_alta_valida_al_docente_en_auth_y_guarda_su_nombre(cliente: TestClient, 
 
 
 def test_docente_que_no_existe_en_auth_se_rechaza(cliente: TestClient, sesion: Session) -> None:
-    respuesta = cliente.post("/materias", json={**SITIOS_WEB, "num_empleado_docente": "100599999"}, headers=ADMIN)
+    respuesta = cliente.post(
+        "/materias", json={**SITIOS_WEB, "num_empleado_docente": "100599999"}, headers=ADMIN
+    )
 
     assert respuesta.status_code == 422
     assert respuesta.json()["error"] == "DOCENTE_NO_ENCONTRADO"
@@ -53,7 +57,9 @@ def test_el_docente_solo_ve_sus_materias(cliente: TestClient, sesion: Session) -
     guardar(
         sesion,
         nueva_materia(),  # de Laura
-        nueva_materia(nrc="48011", nombre="Arquitectura de Software", num_empleado_docente="100534812"),
+        nueva_materia(
+            nrc="48011", nombre="Arquitectura de Software", num_empleado_docente="100534812"
+        ),
     )
 
     de_laura = cliente.get("/materias", headers=DOCENTE)
@@ -80,7 +86,9 @@ def test_docente_no_puede_ver_materia_ajena(cliente: TestClient, sesion: Session
 def test_cambiar_de_docente_actualiza_su_nombre(cliente: TestClient, sesion: Session) -> None:
     guardar(sesion, nueva_materia())
 
-    respuesta = cliente.patch("/materias/48308", json={"num_empleado_docente": "100534812"}, headers=ADMIN)
+    respuesta = cliente.patch(
+        "/materias/48308", json={"num_empleado_docente": "100534812"}, headers=ADMIN
+    )
 
     assert respuesta.status_code == 200
     assert respuesta.json()["nombre_docente"] == "Ricardo Salinas Pérez"
@@ -129,7 +137,9 @@ def test_inscribir_y_listar_en_orden_de_apellidos(cliente: TestClient, sesion: S
     )
 
     for matricula in ("202233918", "202231045"):
-        respuesta = cliente.post("/materias/48308/alumnos", json={"matricula": matricula}, headers=ADMIN)
+        respuesta = cliente.post(
+            "/materias/48308/alumnos", json={"matricula": matricula}, headers=ADMIN
+        )
         assert respuesta.status_code == 201
 
     lista = cliente.get("/materias/48308/alumnos", headers=DOCENTE)
@@ -140,7 +150,9 @@ def test_inscribir_dos_veces_responde_409(cliente: TestClient, sesion: Session) 
     guardar(sesion, nueva_materia(), nuevo_alumno())
     cliente.post("/materias/48308/alumnos", json={"matricula": "202231045"}, headers=ADMIN)
 
-    respuesta = cliente.post("/materias/48308/alumnos", json={"matricula": "202231045"}, headers=ADMIN)
+    respuesta = cliente.post(
+        "/materias/48308/alumnos", json={"matricula": "202231045"}, headers=ADMIN
+    )
 
     assert respuesta.status_code == 409
     assert respuesta.json()["error"] == "YA_INSCRITO"
@@ -149,7 +161,9 @@ def test_inscribir_dos_veces_responde_409(cliente: TestClient, sesion: Session) 
 def test_inscribir_alumno_inexistente_responde_404(cliente: TestClient, sesion: Session) -> None:
     guardar(sesion, nueva_materia())
 
-    respuesta = cliente.post("/materias/48308/alumnos", json={"matricula": "202299999"}, headers=ADMIN)
+    respuesta = cliente.post(
+        "/materias/48308/alumnos", json={"matricula": "202299999"}, headers=ADMIN
+    )
 
     assert respuesta.status_code == 404
 

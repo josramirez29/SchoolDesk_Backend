@@ -39,6 +39,8 @@ def test_si_ya_hay_otro_admin_no_hace_nada(sesion: Session) -> None:
 @pytest.mark.parametrize(
     ("usuario", "contrasena"), [("admin", "contrasena-del-admin"), ("100500001", "corta")]
 )
-def test_datos_invalidos_detienen_el_arranque(sesion: Session, usuario: str, contrasena: str) -> None:
+def test_datos_invalidos_detienen_el_arranque(
+    sesion: Session, usuario: str, contrasena: str
+) -> None:
     with pytest.raises(ValueError):
         crear_admin_inicial(sesion, usuario, contrasena)

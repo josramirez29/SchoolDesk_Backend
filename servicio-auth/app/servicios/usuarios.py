@@ -32,7 +32,9 @@ def crear_usuario(sesion: Session, datos: UsuarioNuevo) -> Usuario:
             422, "ROL_NO_PERMITIDO", "Las cuentas de alumno se crean al dar de alta al alumno"
         )
     if sesion.get(Usuario, datos.usuario) is not None:
-        raise ErrorApp(409, "USUARIO_DUPLICADO", f"Ya existe una cuenta con el usuario {datos.usuario}")
+        raise ErrorApp(
+            409, "USUARIO_DUPLICADO", f"Ya existe una cuenta con el usuario {datos.usuario}"
+        )
     _validar_email_disponible(sesion, datos.email)
 
     nuevo = Usuario(
@@ -49,7 +51,9 @@ def crear_usuario(sesion: Session, datos: UsuarioNuevo) -> Usuario:
     return nuevo
 
 
-def editar_usuario(sesion: Session, usuario: str, datos: UsuarioEdicion, quien_edita: str) -> Usuario:
+def editar_usuario(
+    sesion: Session, usuario: str, datos: UsuarioEdicion, quien_edita: str
+) -> Usuario:
     encontrado = obtener_usuario(sesion, usuario)
 
     if datos.nombre is not None:
@@ -118,6 +122,6 @@ def guardar_cuentas_nuevas(sesion: Session, cuentas: list[CuentaNueva], rol: Rol
             hash_contrasena=hash_contrasena,
             rol=rol,
         )
-        for cuenta, hash_contrasena in zip(cuentas, hashes)
+        for cuenta, hash_contrasena in zip(cuentas, hashes, strict=False)
     )
     sesion.commit()

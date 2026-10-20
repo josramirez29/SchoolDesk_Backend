@@ -86,7 +86,9 @@ def _emails_repetidos_en_el_archivo(filas: list[tuple[int, AlumnoNuevo]]) -> lis
     primera_aparicion: dict[str, int] = {}
     for numero, fila in filas:
         if fila.email in primera_aparicion:
-            mensaje = f"El correo {fila.email} ya aparece en la fila {primera_aparicion[fila.email]}"
+            mensaje = (
+                f"El correo {fila.email} ya aparece en la fila {primera_aparicion[fila.email]}"
+            )
             errores.append(ErrorFila(fila=numero, mensaje=mensaje))
         else:
             primera_aparicion[fila.email] = numero
@@ -184,7 +186,9 @@ def importar_inscripciones(sesion: Session, contenido: bytes) -> ResultadoImport
     errores: list[ErrorFila] = []
     for numero, fila in filas:
         if fila.nrc not in materias:
-            errores.append(ErrorFila(fila=numero, mensaje=f"No existe la materia con NRC {fila.nrc}"))
+            errores.append(
+                ErrorFila(fila=numero, mensaje=f"No existe la materia con NRC {fila.nrc}")
+            )
         if fila.matricula not in alumnos:
             mensaje = f"No existe el alumno con matrícula {fila.matricula}"
             errores.append(ErrorFila(fila=numero, mensaje=mensaje))

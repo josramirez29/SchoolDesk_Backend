@@ -49,7 +49,9 @@ class ClienteInterno:
             return respuesta
         if respuesta.status_code in CODIGOS_QUE_SE_REENVIAN:
             cuerpo = respuesta.json()
-            extra = {campo: valor for campo, valor in cuerpo.items() if campo not in ("error", "detalle")}
+            extra = {
+                campo: valor for campo, valor in cuerpo.items() if campo not in ("error", "detalle")
+            }
             raise ErrorApp(respuesta.status_code, cuerpo["error"], cuerpo["detalle"], extra)
         raise ErrorApp(
             502,

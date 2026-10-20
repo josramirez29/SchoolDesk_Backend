@@ -100,9 +100,7 @@ def categorias_para_calculo(materia: Materia) -> list[CategoriaParaCalculo]:
     ]
 
 
-def puntos_del_alumno_por_materia(
-    sesion: Session, matricula: str
-) -> dict[str, dict[int, Decimal]]:
+def puntos_del_alumno_por_materia(sesion: Session, matricula: str) -> dict[str, dict[int, Decimal]]:
     """{nrc: {tarea_id: puntos}} de UN alumno en todas sus materias, en una sola consulta."""
     consulta = (
         select(Categoria.nrc, Calificacion.tarea_id, Calificacion.puntos)
@@ -145,7 +143,8 @@ def _validar_entradas(
             errores.append(f"La tarea {entrada.tarea_id} no es de esta materia")
         if (entrada.matricula, entrada.tarea_id) in vistas:
             errores.append(
-                f"La calificación de {entrada.matricula} en la tarea {entrada.tarea_id} viene repetida"
+                f"La calificación de {entrada.matricula} "
+                f"en la tarea {entrada.tarea_id} viene repetida"
             )
         vistas.add((entrada.matricula, entrada.tarea_id))
 

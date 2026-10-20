@@ -33,7 +33,9 @@ def generar_qr(
 ) -> QrGenerado:
     sesion = buscar_sesion_activa(bd, nrc, ahora)
     if sesion is None:
-        raise ErrorApp(409, "SIN_SESION_ACTIVA", "No hay una sesión de asistencia abierta para esta materia")
+        raise ErrorApp(
+            409, "SIN_SESION_ACTIVA", "No hay una sesión de asistencia abierta para esta materia"
+        )
 
     # La inscripción se valida aquí, al generar, y no al escanear: el token dura
     # 30 s y queda ligado a esta matrícula, así se evita llamar a academic en el

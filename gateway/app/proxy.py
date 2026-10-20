@@ -51,7 +51,9 @@ async def reenviar(
             content=await peticion.body(),
         )
     except httpx.TimeoutException:  # va antes porque también es un HTTPError
-        raise ErrorApp(504, "TIEMPO_AGOTADO", f"El servicio {servicio} tardó demasiado en responder")
+        raise ErrorApp(
+            504, "TIEMPO_AGOTADO", f"El servicio {servicio} tardó demasiado en responder"
+        )
     except httpx.HTTPError:
         raise ErrorApp(503, "SERVICIO_NO_DISPONIBLE", f"El servicio {servicio} no está disponible")
 

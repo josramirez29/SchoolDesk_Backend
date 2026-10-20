@@ -38,7 +38,9 @@ def docentes_de_ejemplo(auth_falso: ClienteAuthFalso) -> None:
     """Hace que el auth falso conozca a los 8 docentes de datos-ejemplo/docentes.csv."""
     with open(DATOS_EJEMPLO / "docentes.csv", encoding="utf-8-sig") as archivo:
         auth_falso.docentes = [
-            Docente(usuario=fila["num_empleado"], nombre=fila["nombre"], apellidos=fila["apellidos"])
+            Docente(
+                usuario=fila["num_empleado"], nombre=fila["nombre"], apellidos=fila["apellidos"]
+            )
             for fila in csv.DictReader(archivo)
         ]
 
@@ -90,7 +92,10 @@ def test_email_en_uso_segun_auth_se_reporta_en_su_fila(
 
     assert respuesta.status_code == 422
     assert respuesta.json()["filas"] == [
-        {"fila": 3, "mensaje": "El correo bruno.aguilar@alumno.example.com ya pertenece a otra cuenta"}
+        {
+            "fila": 3,
+            "mensaje": "El correo bruno.aguilar@alumno.example.com ya pertenece a otra cuenta",
+        }
     ]
     assert contar(sesion, Alumno) == 0
 
@@ -123,10 +128,10 @@ def test_importa_las_materias_de_ejemplo_con_el_nombre_del_docente(
 
 def test_materia_con_docente_desconocido_se_reporta(cliente: TestClient, sesion: Session) -> None:
     contenido = (
-        "nrc,clave,nombre,seccion,num_empleado_docente\n"
-        "48308,ITIS 702,Desarrollo de Sitios Web,001,100521347\n"
-        "48011,ITIS 611,Arquitectura de Software,001,100599999\n"
-    ).encode()
+        b"nrc,clave,nombre,seccion,num_empleado_docente\n"
+        b"48308,ITIS 702,Desarrollo de Sitios Web,001,100521347\n"
+        b"48011,ITIS 611,Arquitectura de Software,001,100599999\n"
+    )
 
     respuesta = importar(cliente, "materias", contenido)
 
@@ -161,12 +166,7 @@ def test_inscripcion_con_materia_o_alumno_inexistente_se_reporta(
 ) -> None:
     sesion.add_all([nueva_materia(), nuevo_alumno()])
     sesion.commit()
-    contenido = (
-        "nrc,matricula\n"
-        "48308,202231045\n"
-        "99999,202231045\n"
-        "48308,202299999\n"
-    ).encode()
+    contenido = b"nrc,matricula\n" b"48308,202231045\n" b"99999,202231045\n" b"48308,202299999\n"
 
     respuesta = importar(cliente, "inscripciones", contenido)
 

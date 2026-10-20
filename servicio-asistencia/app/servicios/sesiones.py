@@ -59,7 +59,9 @@ def obtener_sesion_del_docente(bd: Session, sesion_id: int, docente: UsuarioActu
     return sesion
 
 
-def cerrar_sesion(bd: Session, sesion_id: int, docente: UsuarioActual, ahora: datetime) -> SesionDetalle:
+def cerrar_sesion(
+    bd: Session, sesion_id: int, docente: UsuarioActual, ahora: datetime
+) -> SesionDetalle:
     sesion = obtener_sesion_del_docente(bd, sesion_id, docente)
     if not sesion.esta_activa(ahora):
         raise ErrorApp(409, "SESION_TERMINADA", "La sesión ya terminó")

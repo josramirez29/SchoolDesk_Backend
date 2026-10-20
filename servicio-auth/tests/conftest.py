@@ -7,9 +7,9 @@ from sqlalchemy.orm import Session, sessionmaker
 from testcontainers.postgres import PostgresContainer
 
 from app.base_datos import Base, obtener_sesion
+from app.configuracion import obtener_configuracion
 from app.main import app
 from app.modelos import Usuario
-from app.configuracion import obtener_configuracion
 from schooldesk_comun.configuracion import obtener_configuracion_comun
 from schooldesk_comun.roles import Rol
 from tests.fabricas import nuevo_usuario

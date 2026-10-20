@@ -8,7 +8,9 @@ import pytest
 from app.clientes.auth import ClienteAuth, CuentaAlumno
 from schooldesk_comun.errores import ErrorApp
 
-CUENTA = CuentaAlumno(usuario="202231045", nombre="Ana", apellidos="Acosta", email="ana@example.com")
+CUENTA = CuentaAlumno(
+    usuario="202231045", nombre="Ana", apellidos="Acosta", email="ana@example.com"
+)
 
 
 def cliente_con(responder: Callable[[httpx.Request], httpx.Response]) -> ClienteAuth:
@@ -36,7 +38,11 @@ def test_manda_la_clave_interna_y_lee_la_respuesta() -> None:
 
 def test_error_de_negocio_se_reenvia_con_sus_datos() -> None:
     def responder(_: httpx.Request) -> httpx.Response:
-        cuerpo = {"error": "EMAIL_EN_USO", "detalle": "Correo en uso", "emails": ["ana@example.com"]}
+        cuerpo = {
+            "error": "EMAIL_EN_USO",
+            "detalle": "Correo en uso",
+            "emails": ["ana@example.com"],
+        }
         return httpx.Response(409, json=cuerpo)
 
     with pytest.raises(ErrorApp) as error:

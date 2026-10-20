@@ -57,7 +57,9 @@ def test_no_se_abren_dos_sesiones_a_la_vez(cliente: TestClient) -> None:
     assert respuesta.json()["sesion_id"] == primera["id"]
 
 
-def test_cuando_la_sesion_expira_se_puede_abrir_otra(cliente: TestClient, reloj: RelojFalso) -> None:
+def test_cuando_la_sesion_expira_se_puede_abrir_otra(
+    cliente: TestClient, reloj: RelojFalso
+) -> None:
     abrir(cliente)
 
     reloj.avanzar(11)  # 9:11: la primera ya terminó sola

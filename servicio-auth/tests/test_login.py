@@ -12,7 +12,9 @@ def hacer_login(cliente: TestClient, usuario: str, contrasena: str) -> Response:
     return cliente.post("/login", json={"usuario": usuario, "contrasena": contrasena})
 
 
-def test_login_correcto_devuelve_token_con_identidad_y_rol(cliente: TestClient, sesion: Session) -> None:
+def test_login_correcto_devuelve_token_con_identidad_y_rol(
+    cliente: TestClient, sesion: Session
+) -> None:
     sesion.add(nuevo_usuario())
     sesion.commit()
 

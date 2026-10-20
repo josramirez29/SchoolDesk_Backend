@@ -18,7 +18,11 @@ def test_lee_utf8_con_bom_y_conserva_acentos() -> None:
 
     filas = leer_csv(contenido, COLUMNAS)
 
-    assert filas[0].valores == {"matricula": "202231045", "nombre": "Ana Sofía", "email": "ana@example.com"}
+    assert filas[0].valores == {
+        "matricula": "202231045",
+        "nombre": "Ana Sofía",
+        "email": "ana@example.com",
+    }
 
 
 def test_lee_el_formato_csv_de_excel_en_windows() -> None:
@@ -39,7 +43,9 @@ def test_acepta_punto_y_coma_como_separador() -> None:
 
 
 def test_numera_las_filas_como_excel_e_ignora_filas_vacias() -> None:
-    contenido = b"matricula,nombre,email\n202231045,Ana,a@example.com\n,,\n202233918,Bruno,b@example.com\n"
+    contenido = (
+        b"matricula,nombre,email\n202231045,Ana,a@example.com\n,,\n202233918,Bruno,b@example.com\n"
+    )
 
     filas = leer_csv(contenido, COLUMNAS)
 
@@ -67,12 +73,12 @@ def test_archivo_sin_datos_se_rechaza() -> None:
 
 def test_validar_reporta_todas_las_filas_con_error_y_no_devuelve_nada() -> None:
     contenido = (
-        "matricula,nombre,email\n"
-        "202231045,Ana,ana@example.com\n"
-        "20223,Bruno,bruno@example.com\n"  # matrícula corta
-        "202235502,,camila@example.com\n"  # nombre vacío
-        "202231045,Ana otra vez,otra@example.com\n"  # matrícula repetida
-    ).encode()
+        b"matricula,nombre,email\n"
+        b"202231045,Ana,ana@example.com\n"
+        b"20223,Bruno,bruno@example.com\n"  # matrícula corta
+        b"202235502,,camila@example.com\n"  # nombre vacío
+        b"202231045,Ana otra vez,otra@example.com\n"  # matrícula repetida
+    )
     filas = leer_csv(contenido, COLUMNAS)
 
     with pytest.raises(ErrorApp) as error:

@@ -26,7 +26,9 @@ def buscar_alumnos(sesion: Session, buscar: str | None = None) -> list[Alumno]:
 def obtener_alumno(sesion: Session, matricula: str) -> Alumno:
     alumno = sesion.get(Alumno, matricula)
     if alumno is None:
-        raise ErrorApp(404, "ALUMNO_NO_ENCONTRADO", f"No existe el alumno con matrícula {matricula}")
+        raise ErrorApp(
+            404, "ALUMNO_NO_ENCONTRADO", f"No existe el alumno con matrícula {matricula}"
+        )
     return alumno
 
 
@@ -46,7 +48,9 @@ def obtener_detalle(sesion: Session, matricula: str) -> AlumnoDetalle:
 
 def crear_alumno(sesion: Session, cliente_auth: ClienteAuth, datos: AlumnoNuevo) -> Alumno:
     if sesion.get(Alumno, datos.matricula) is not None:
-        raise ErrorApp(409, "ALUMNO_DUPLICADO", f"Ya existe el alumno con matrícula {datos.matricula}")
+        raise ErrorApp(
+            409, "ALUMNO_DUPLICADO", f"Ya existe el alumno con matrícula {datos.matricula}"
+        )
 
     # 1) Primero la cuenta en auth. Si auth falla, aquí no se guardó nada.
     # 2) Después el registro académico. Si esto fallara, repetir el alta es

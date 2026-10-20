@@ -25,7 +25,11 @@ def sitios_web(sesion: Session) -> Materia:
     examenes.tareas.append(Tarea(nombre="Parcial 1"))
     materia.categorias.extend([practicas, examenes])
     sesion.add_all(
-        [materia, nuevo_alumno(), nuevo_alumno(matricula=BRUNO, nombre="Bruno", apellidos="Aguilar")]
+        [
+            materia,
+            nuevo_alumno(),
+            nuevo_alumno(matricula=BRUNO, nombre="Bruno", apellidos="Aguilar"),
+        ]
     )
     sesion.flush()
 

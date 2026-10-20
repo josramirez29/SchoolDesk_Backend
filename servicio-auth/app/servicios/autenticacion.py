@@ -28,7 +28,9 @@ def iniciar_sesion(sesion: Session, usuario: str, contrasena: str) -> RespuestaL
         raise _credenciales_invalidas()
 
     if not encontrado.activo:
-        raise ErrorApp(403, "CUENTA_DESACTIVADA", "Tu cuenta está desactivada, contacta al administrador")
+        raise ErrorApp(
+            403, "CUENTA_DESACTIVADA", "Tu cuenta está desactivada, contacta al administrador"
+        )
 
     return RespuestaLogin(
         token_acceso=crear_token(encontrado),
@@ -57,7 +59,9 @@ def cambiar_contrasena(sesion: Session, usuario: str, actual: str, nueva: str) -
     if nueva == encontrado.usuario:
         # La contraseña inicial es la matrícula o el número de empleado, que no son secretos.
         raise ErrorApp(
-            422, "CONTRASENA_INSEGURA", "La contraseña no puede ser tu matrícula o número de empleado"
+            422,
+            "CONTRASENA_INSEGURA",
+            "La contraseña no puede ser tu matrícula o número de empleado",
         )
 
     encontrado.hash_contrasena = generar_hash(nueva)

@@ -16,7 +16,9 @@ def test_materia_con_categorias_tareas_y_calificacion(sesion: Session) -> None:
     materia.categorias.append(practicas)
     sesion.add_all([nuevo_alumno(), materia])
     sesion.flush()
-    sesion.add(Calificacion(tarea_id=practicas.tareas[0].id, matricula="202231045", puntos=Decimal("95.5")))
+    sesion.add(
+        Calificacion(tarea_id=practicas.tareas[0].id, matricula="202231045", puntos=Decimal("95.5"))
+    )
     sesion.commit()
 
     guardada = sesion.get(Materia, "48308")
@@ -66,7 +68,9 @@ def test_puntos_fuera_de_0_a_100_los_rechaza_la_base(sesion: Session, puntos: st
     sesion.add_all([nuevo_alumno(), materia])
     sesion.flush()
 
-    sesion.add(Calificacion(tarea_id=categoria.tareas[0].id, matricula="202231045", puntos=Decimal(puntos)))
+    sesion.add(
+        Calificacion(tarea_id=categoria.tareas[0].id, matricula="202231045", puntos=Decimal(puntos))
+    )
     with pytest.raises(IntegrityError):
         sesion.commit()
 

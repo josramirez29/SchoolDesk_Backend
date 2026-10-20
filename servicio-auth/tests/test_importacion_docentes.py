@@ -25,7 +25,9 @@ def contar_docentes(sesion: Session) -> int:
     return sesion.scalar(select(func.count()).where(Usuario.rol == Rol.DOCENTE))
 
 
-def test_importa_el_archivo_de_ejemplo(cliente: TestClient, sesion: Session, admin: Usuario) -> None:
+def test_importa_el_archivo_de_ejemplo(
+    cliente: TestClient, sesion: Session, admin: Usuario
+) -> None:
     respuesta = importar(cliente, admin, DOCENTES_EJEMPLO.read_bytes())
 
     assert respuesta.status_code == 200
@@ -37,7 +39,9 @@ def test_importa_el_archivo_de_ejemplo(cliente: TestClient, sesion: Session, adm
     assert login.json()["usuario"]["nombre"] == "Laura"
 
 
-def test_importar_dos_veces_no_duplica(cliente: TestClient, sesion: Session, admin: Usuario) -> None:
+def test_importar_dos_veces_no_duplica(
+    cliente: TestClient, sesion: Session, admin: Usuario
+) -> None:
     importar(cliente, admin, DOCENTES_EJEMPLO.read_bytes())
 
     respuesta = importar(cliente, admin, DOCENTES_EJEMPLO.read_bytes())

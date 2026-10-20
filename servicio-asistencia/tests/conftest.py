@@ -2,9 +2,9 @@ from collections.abc import Iterator
 
 import pytest
 from fastapi.testclient import TestClient
+from redis import Redis
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
-from redis import Redis
 from testcontainers.postgres import PostgresContainer
 from testcontainers.redis import RedisContainer
 
@@ -84,4 +84,3 @@ def cliente(
     app.dependency_overrides[obtener_ahora] = lambda: reloj.ahora
     yield TestClient(app)
     app.dependency_overrides.clear()
-

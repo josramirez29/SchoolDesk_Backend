@@ -85,7 +85,9 @@ def test_devuelve_la_respuesta_del_servicio_tal_cual(
     assert respuesta.json()["error"] == "YA_INSCRITO"
 
 
-def test_servicio_desconocido_responde_404(cliente: TestClient, servicios: ServiciosSimulados) -> None:
+def test_servicio_desconocido_responde_404(
+    cliente: TestClient, servicios: ServiciosSimulados
+) -> None:
     respuesta = cliente.get("/api/calificaciones/algo")
 
     assert respuesta.status_code == 404
@@ -181,7 +183,10 @@ def test_cors_permite_al_frontend(cliente: TestClient) -> None:
 def test_cors_no_permite_otros_origenes(cliente: TestClient) -> None:
     respuesta = cliente.options(
         "/api/auth/login",
-        headers={"Origin": "https://sitio-malicioso.example", "Access-Control-Request-Method": "POST"},
+        headers={
+            "Origin": "https://sitio-malicioso.example",
+            "Access-Control-Request-Method": "POST",
+        },
     )
 
     assert "access-control-allow-origin" not in respuesta.headers

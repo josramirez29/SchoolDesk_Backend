@@ -49,7 +49,11 @@ def test_error_de_negocio_se_reenvia_con_sus_datos() -> None:
     with pytest.raises(ErrorApp) as error:
         cliente_con(responder)._enviar("GET", "/interno/algo")
 
-    assert (error.value.codigo_http, error.value.error, error.value.extra) == (409, "DUPLICADO", {"ids": [1]})
+    assert (error.value.codigo_http, error.value.error, error.value.extra) == (
+        409,
+        "DUPLICADO",
+        {"ids": [1]},
+    )
 
 
 @pytest.mark.parametrize("codigo", [401, 500])

@@ -27,7 +27,9 @@ def generar_qr(cliente: TestClient, alumno: dict[str, str] = ALUMNO, nrc: str = 
 def escanear(
     cliente: TestClient, sesion_id: int, token: str, docente: dict[str, str] = DOCENTE
 ) -> dict:
-    respuesta = cliente.post(f"/sesiones/{sesion_id}/escanear", json={"token": token}, headers=docente)
+    respuesta = cliente.post(
+        f"/sesiones/{sesion_id}/escanear", json={"token": token}, headers=docente
+    )
     return {"codigo": respuesta.status_code, **respuesta.json()}
 
 

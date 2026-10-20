@@ -69,8 +69,18 @@ def test_reporte_combina_calificaciones_y_asistencia(
     assert cuerpo["total_sesiones"] == 10
     filas = por_matricula(cuerpo)
     assert filas[ANA]["promedio"] == 9.5
-    assert filas[ANA]["asistencia"] == {"presentes": 7, "retardos": 1, "faltas": 2, "porcentaje": 80.0}
-    assert filas[CAMILA]["asistencia"] == {"presentes": 0, "retardos": 0, "faltas": 10, "porcentaje": 0.0}
+    assert filas[ANA]["asistencia"] == {
+        "presentes": 7,
+        "retardos": 1,
+        "faltas": 2,
+        "porcentaje": 80.0,
+    }
+    assert filas[CAMILA]["asistencia"] == {
+        "presentes": 0,
+        "retardos": 0,
+        "faltas": 10,
+        "porcentaje": 0.0,
+    }
 
 
 @pytest.mark.usefixtures("materia")

@@ -36,7 +36,10 @@ def importar_docentes(sesion: Session, contenido: bytes) -> ResultadoImportacion
 
     cuentas = [
         CuentaNueva(
-            usuario=fila.num_empleado, nombre=fila.nombre, apellidos=fila.apellidos, email=fila.email
+            usuario=fila.num_empleado,
+            nombre=fila.nombre,
+            apellidos=fila.apellidos,
+            email=fila.email,
         )
         for _, fila in nuevas
     ]
@@ -55,7 +58,9 @@ def _errores_de_email(sesion: Session, nuevas: list[tuple[int, FilaDocente]]) ->
             mensaje = f"El correo {fila.email} ya pertenece a otra cuenta"
             errores.append(ErrorFila(fila=numero, mensaje=mensaje))
         elif fila.email in primera_aparicion:
-            mensaje = f"El correo {fila.email} ya aparece en la fila {primera_aparicion[fila.email]}"
+            mensaje = (
+                f"El correo {fila.email} ya aparece en la fila {primera_aparicion[fila.email]}"
+            )
             errores.append(ErrorFila(fila=numero, mensaje=mensaje))
         else:
             primera_aparicion[fila.email] = numero

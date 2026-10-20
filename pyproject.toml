@@ -1,0 +1,24 @@
+# Configuración de ruff (formato y revisión de código) para todo el backend.
+#   ruff format .        → da formato a todo el código
+#   ruff check --fix .   → revisa errores comunes y corrige los que puede
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+# Cada carpeta tiene su propio paquete "app" y "tests"; así ruff los reconoce como nuestros.
+src = ["comun", "servicio-auth", "servicio-academico", "servicio-asistencia", "gateway"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # errores de estilo (PEP 8)
+    "F",   # errores reales: imports o variables sin usar, nombres no definidos
+    "I",   # imports ordenados
+    "UP",  # sintaxis moderna de Python 3.12
+    "B",   # errores frecuentes (bugbear)
+]
+ignore = [
+    "B008",  # FastAPI usa Depends(...) como valor por defecto: es su forma normal
+    "B904",  # "raise ... from err": aquí convertimos errores técnicos en ErrorApp a propósito
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "schooldesk_comun", "tests"]

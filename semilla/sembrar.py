@@ -32,7 +32,10 @@ SEMILLA = 48308
 # Parcial 2 y el Proyecto quedan SIN calificar a propósito, para mostrar el
 # "promedio actual" (las categorías sin calificaciones no cuentan todavía).
 PONDERACIONES = {
-    "Prácticas": (40, ["Práctica 1: HTML semántico", "Práctica 2: CSS Grid", "Práctica 3: Blog de café"]),
+    "Prácticas": (
+        40,
+        ["Práctica 1: HTML semántico", "Práctica 2: CSS Grid", "Práctica 3: Blog de café"],
+    ),
     "Exámenes": (40, ["Parcial 1", "Parcial 2"]),
     "Proyecto": (20, ["Proyecto final"]),
 }
@@ -52,7 +55,9 @@ def main() -> None:
         detener(f"Algún servicio no responde: {estados}. ¿Corriste docker compose up -d?")
 
     paso("Entrando como el admin inicial")
-    admin = iniciar_sesion(api, entorno["ADMIN_INICIAL_USUARIO"], entorno["ADMIN_INICIAL_CONTRASENA"])
+    admin = iniciar_sesion(
+        api, entorno["ADMIN_INICIAL_USUARIO"], entorno["ADMIN_INICIAL_CONTRASENA"]
+    )
 
     # El orden importa: las materias necesitan a los docentes y las
     # inscripciones necesitan alumnos y materias.
@@ -118,9 +123,17 @@ def sembrar_calificaciones(api: httpx.Client, docente: dict[str, str], rng: rand
         for tarea_id in tareas_a_calificar:
             no_entrego = rng.random() < 0.05
             puntos = 0 if no_entrego else max(0, min(100, nivel + rng.randint(-12, 12)))
-            entradas.append({"matricula": alumno["matricula"], "tarea_id": tarea_id, "puntos": puntos})
+            entradas.append(
+                {"matricula": alumno["matricula"], "tarea_id": tarea_id, "puntos": puntos}
+            )
 
-    pedir(api, "PUT", f"/api/academico/materias/{NRC_DEMO}/calificaciones", headers=docente, json=entradas)
+    pedir(
+        api,
+        "PUT",
+        f"/api/academico/materias/{NRC_DEMO}/calificaciones",
+        headers=docente,
+        json=entradas,
+    )
     print(f"   {len(categorias)} categorías, {len(entradas)} calificaciones capturadas")
 
 
@@ -131,10 +144,14 @@ def sembrar_asistencia(api: httpx.Client, docente: dict[str, str], rng: random.R
     tokens = {a["matricula"]: iniciar_sesion(api, a["matricula"], a["matricula"]) for a in alumnos}
 
     for numero in range(1, SESIONES_DE_ASISTENCIA + 1):
-        sesion = pedir(api, "POST", "/api/asistencia/sesiones", headers=docente, json={"nrc": NRC_DEMO})
+        sesion = pedir(
+            api, "POST", "/api/asistencia/sesiones", headers=docente, json={"nrc": NRC_DEMO}
+        )
         asistentes = [m for m in tokens if rng.random() > 0.12]  # ~88 % de asistencia
         for matricula in asistentes:
-            qr = pedir(api, "POST", "/api/asistencia/qr", headers=tokens[matricula], json={"nrc": NRC_DEMO})
+            qr = pedir(
+                api, "POST", "/api/asistencia/qr", headers=tokens[matricula], json={"nrc": NRC_DEMO}
+            )
             pedir(
                 api,
                 "POST",
@@ -150,7 +167,9 @@ def sembrar_asistencia(api: httpx.Client, docente: dict[str, str], rng: random.R
 
 
 def iniciar_sesion(api: httpx.Client, usuario: str, contrasena: str) -> dict[str, str]:
-    respuesta = pedir(api, "POST", "/api/auth/login", json={"usuario": usuario, "contrasena": contrasena})
+    respuesta = pedir(
+        api, "POST", "/api/auth/login", json={"usuario": usuario, "contrasena": contrasena}
+    )
     return {"Authorization": f"Bearer {respuesta['token_acceso']}"}
 
 
@@ -194,7 +213,10 @@ def detener(mensaje: str) -> None:
 
 def imprimir_credenciales(entorno: dict[str, str]) -> None:
     print("\n✓ Listo. Usuarios para la demo (la contraseña inicial es el mismo número):")
-    print(f"   Admin:   {entorno['ADMIN_INICIAL_USUARIO']}  (contraseña: ADMIN_INICIAL_CONTRASENA de .env)")
+    print(
+        f"   Admin:   {entorno['ADMIN_INICIAL_USUARIO']}"
+        "  (contraseña: ADMIN_INICIAL_CONTRASENA de .env)"
+    )
     print(f"   Docente: {DOCENTE_DEMO}  Laura Méndez Ortega, imparte {NRC_DEMO} y 50130")
     print("   Alumna:  202231045  Ana Sofía Acosta Bravo")
 
