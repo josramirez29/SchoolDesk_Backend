@@ -10,6 +10,7 @@ from schooldesk_comun.seguridad import requerir_roles
 
 solo_admin = requerir_roles(Rol.ADMIN)
 admin_o_docente = requerir_roles(Rol.ADMIN, Rol.DOCENTE)
+solo_alumno = requerir_roles(Rol.ALUMNO)
 
 
 @lru_cache  # un solo cliente para todo el servicio: reutiliza las conexiones abiertas

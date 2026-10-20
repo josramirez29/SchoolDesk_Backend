@@ -138,3 +138,30 @@ class FilaConcentrado(BaseModel):
 class Concentrado(BaseModel):
     categorias: list[CategoriaRespuesta]  # las columnas
     alumnos: list[FilaConcentrado]  # las filas
+
+
+# --- Vista del alumno ---
+
+
+class MiMateria(MateriaResumen):
+    promedio: DecimalJson | None  # 0–10, None si aún no tiene calificaciones
+
+
+class MiTarea(BaseModel):
+    id: int
+    nombre: str
+    puntos: DecimalJson | None  # None = sin calificar
+
+
+class MiCategoria(BaseModel):
+    id: int
+    nombre: str
+    peso: DecimalJson
+    promedio: DecimalJson | None  # 0–100
+    tareas: list[MiTarea]
+
+
+class MisCalificaciones(BaseModel):
+    materia: MateriaResumen
+    promedio: DecimalJson | None
+    categorias: list[MiCategoria]

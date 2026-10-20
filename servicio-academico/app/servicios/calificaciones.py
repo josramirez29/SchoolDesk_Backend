@@ -100,6 +100,23 @@ def categorias_para_calculo(materia: Materia) -> list[CategoriaParaCalculo]:
     ]
 
 
+def puntos_del_alumno_por_materia(
+    sesion: Session, matricula: str
+) -> dict[str, dict[int, Decimal]]:
+    """{nrc: {tarea_id: puntos}} de UN alumno en todas sus materias, en una sola consulta."""
+    consulta = (
+        select(Categoria.nrc, Calificacion.tarea_id, Calificacion.puntos)
+        .select_from(Calificacion)
+        .join(Tarea)
+        .join(Categoria)
+        .where(Calificacion.matricula == matricula)
+    )
+    puntos: dict[str, dict[int, Decimal]] = {}
+    for nrc, tarea_id, valor in sesion.execute(consulta):
+        puntos.setdefault(nrc, {})[tarea_id] = valor
+    return puntos
+
+
 # --- Privadas ---
 
 
