@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.modelos import EstadoAsistencia
 from schooldesk_comun.tipos import Nrc
@@ -36,3 +36,30 @@ class SesionResumen(BaseModel):
 
 class SesionDetalle(SesionResumen):
     registros: list[RegistroRespuesta]  # en orden de llegada
+
+
+# --- QR (alumno) y escaneo (docente) ---
+
+
+class SolicitudQr(BaseModel):
+    nrc: Nrc
+
+
+class QrGenerado(BaseModel):
+    """El frontend convierte `token` en la imagen del QR y pide otro antes de que expire."""
+
+    token: str
+    segundos_de_vida: int
+    sesion_id: int
+
+
+class Escaneo(BaseModel):
+    token: str = Field(min_length=1, max_length=100)
+
+
+class DatosQr(BaseModel):
+    """Lo que se guarda en Redis junto al token. Nunca sale de este servicio."""
+
+    sesion_id: int
+    matricula: str
+    nombre: str

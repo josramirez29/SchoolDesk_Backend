@@ -4,12 +4,15 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from redis import Redis
 from testcontainers.postgres import PostgresContainer
+from testcontainers.redis import RedisContainer
 
 from app import modelos  # noqa: F401  (registra las tablas en Base.metadata)
 from app.base_datos import Base, obtener_bd
 from app.dependencias import obtener_cliente_academico
 from app.main import app
+from app.redis_cliente import obtener_redis
 from app.reloj import obtener_ahora
 from schooldesk_comun.configuracion import obtener_configuracion_comun
 from tests.claves import CLAVE_INTERNA_PRUEBA, CLAVE_JWT_PRUEBA
@@ -44,6 +47,22 @@ def bd(motor: Engine) -> Iterator[Session]:
     Base.metadata.drop_all(motor)
 
 
+@pytest.fixture(scope="session")
+def contenedor_redis() -> Iterator[RedisContainer]:
+    """Redis real dentro de un contenedor de Docker, uno para toda la corrida."""
+    with RedisContainer("redis:7-alpine") as contenedor:
+        yield contenedor
+
+
+@pytest.fixture
+def redis(contenedor_redis: RedisContainer) -> Iterator[Redis]:
+    """Redis vacío para cada prueba."""
+    cliente = contenedor_redis.get_client(decode_responses=True)
+    cliente.flushdb()
+    yield cliente
+    cliente.close()
+
+
 @pytest.fixture
 def academico_falso() -> ClienteAcademicoFalso:
     return ClienteAcademicoFalso()
@@ -56,10 +75,11 @@ def reloj() -> RelojFalso:
 
 @pytest.fixture
 def cliente(
-    bd: Session, academico_falso: ClienteAcademicoFalso, reloj: RelojFalso
+    bd: Session, redis: Redis, academico_falso: ClienteAcademicoFalso, reloj: RelojFalso
 ) -> Iterator[TestClient]:
-    """Cliente HTTP de la API con la base de pruebas, academic falso y reloj falso."""
+    """Cliente HTTP de la API con la base y Redis de prueba, academic falso y reloj falso."""
     app.dependency_overrides[obtener_bd] = lambda: bd
+    app.dependency_overrides[obtener_redis] = lambda: redis
     app.dependency_overrides[obtener_cliente_academico] = lambda: academico_falso
     app.dependency_overrides[obtener_ahora] = lambda: reloj.ahora
     yield TestClient(app)
