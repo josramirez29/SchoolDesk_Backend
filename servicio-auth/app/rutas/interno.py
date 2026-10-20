@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.base_datos import obtener_sesion
-from app.esquemas import DocenteResumen, RespuestaLote, SolicitudLoteAlumnos
+from app.esquemas import DocenteResumen, NombreActualizado, RespuestaLote, SolicitudLoteAlumnos
 from app.modelos import Usuario
 from app.servicios import interno
 from schooldesk_comun.interno import requerir_clave_interna
@@ -29,3 +29,10 @@ def crear_cuentas_de_alumnos(
 @router.get("/docentes", response_model=list[DocenteResumen])
 def listar_docentes(sesion: Session = Depends(obtener_sesion)) -> list[Usuario]:
     return interno.listar_docentes_activos(sesion)
+
+
+@router.patch("/usuarios/{usuario}/nombre", status_code=204)
+def actualizar_nombre(
+    usuario: str, datos: NombreActualizado, sesion: Session = Depends(obtener_sesion)
+) -> None:
+    interno.actualizar_nombre(sesion, usuario, datos.nombre, datos.apellidos)

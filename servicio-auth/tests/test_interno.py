@@ -95,3 +95,27 @@ def test_lista_solo_docentes_activos(cliente: TestClient, sesion: Session, admin
 
     assert respuesta.status_code == 200
     assert [d["usuario"] for d in respuesta.json()] == ["100521347"]  # ni el inactivo ni el admin
+
+
+def test_actualizar_nombre_cambia_el_nombre_del_token(cliente: TestClient) -> None:
+    crear_lote(cliente, ANA)
+
+    respuesta = cliente.patch(
+        "/interno/usuarios/202231045/nombre",
+        json={"nombre": "Ana Sofía", "apellidos": "Acosta Bravo de la Cruz"},
+        headers=CLAVE,
+    )
+
+    assert respuesta.status_code == 204
+    login = cliente.post("/login", json={"usuario": "202231045", "contrasena": "202231045"})
+    assert login.json()["usuario"]["apellidos"] == "Acosta Bravo de la Cruz"
+
+
+def test_actualizar_nombre_de_usuario_inexistente_responde_404(cliente: TestClient) -> None:
+    respuesta = cliente.patch(
+        "/interno/usuarios/202299999/nombre",
+        json={"nombre": "Nadie", "apellidos": "Nadie"},
+        headers=CLAVE,
+    )
+
+    assert respuesta.status_code == 404

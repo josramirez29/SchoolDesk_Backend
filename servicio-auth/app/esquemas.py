@@ -4,21 +4,14 @@ Se separan del modelo de la base de datos para no exponer nunca campos
 internos como `hash_contrasena`.
 """
 
-from typing import Annotated
-
-from pydantic import AfterValidator, BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from schooldesk_comun.roles import Rol
-
-PATRON_IDENTIFICADOR = r"^\d{9}$"  # matrícula o número de empleado BUAP
-
-
-# "Laura.Mendez@..." y "laura.mendez@..." son el mismo correo: se guarda en minúsculas.
-EmailNormalizado = Annotated[EmailStr, AfterValidator(str.lower)]
+from schooldesk_comun.tipos import EmailNormalizado, Identificador
 
 
 class SolicitudLogin(BaseModel):
-    usuario: str = Field(pattern=PATRON_IDENTIFICADOR, examples=["100521347"])
+    usuario: Identificador
     contrasena: str = Field(min_length=1, max_length=72)  # bcrypt solo usa 72 bytes
 
 
@@ -40,7 +33,7 @@ class RespuestaLogin(BaseModel):
 
 
 class UsuarioNuevo(BaseModel):
-    usuario: str = Field(pattern=PATRON_IDENTIFICADOR, examples=["100521347"])
+    usuario: Identificador
     nombre: str = Field(min_length=1, max_length=100)
     apellidos: str = Field(min_length=1, max_length=100)
     email: EmailNormalizado
@@ -65,7 +58,7 @@ class CambioContrasena(BaseModel):
 class FilaDocente(BaseModel):
     """Una fila de docentes.csv. Los nombres de los campos son las columnas del archivo."""
 
-    num_empleado: str = Field(pattern=PATRON_IDENTIFICADOR)
+    num_empleado: Identificador
     nombre: str = Field(min_length=1, max_length=100)
     apellidos: str = Field(min_length=1, max_length=100)
     email: EmailNormalizado
@@ -78,7 +71,7 @@ COLUMNAS_DOCENTES = list(FilaDocente.model_fields)
 
 
 class CuentaNueva(BaseModel):
-    usuario: str = Field(pattern=PATRON_IDENTIFICADOR)
+    usuario: Identificador
     nombre: str = Field(min_length=1, max_length=100)
     apellidos: str = Field(min_length=1, max_length=100)
     email: EmailNormalizado
@@ -100,3 +93,8 @@ class DocenteResumen(BaseModel):
     nombre: str
     apellidos: str
     email: str
+
+
+class NombreActualizado(BaseModel):
+    nombre: str = Field(min_length=1, max_length=100)
+    apellidos: str = Field(min_length=1, max_length=100)

@@ -5,7 +5,12 @@ from sqlalchemy.orm import Session
 
 from app.esquemas import CuentaNueva, RespuestaLote
 from app.modelos import Usuario
-from app.servicios.usuarios import emails_en_uso, guardar_cuentas_nuevas, usuarios_existentes
+from app.servicios.usuarios import (
+    emails_en_uso,
+    guardar_cuentas_nuevas,
+    obtener_usuario,
+    usuarios_existentes,
+)
 from schooldesk_comun.errores import ErrorApp
 from schooldesk_comun.roles import Rol
 
@@ -63,3 +68,12 @@ def _validar_sin_repetidos(cuentas: list[CuentaNueva]) -> None:
     emails = [cuenta.email for cuenta in cuentas]
     if len(set(usuarios)) != len(usuarios) or len(set(emails)) != len(emails):
         raise ErrorApp(422, "LOTE_CON_REPETIDOS", "El lote tiene matrículas o correos repetidos")
+
+
+def actualizar_nombre(sesion: Session, usuario: str, nombre: str, apellidos: str) -> None:
+    """Academic llama aquí cuando el admin corrige el nombre de un alumno,
+    para que el nombre del token (el que se ve al iniciar sesión) coincida."""
+    encontrado = obtener_usuario(sesion, usuario)
+    encontrado.nombre = nombre
+    encontrado.apellidos = apellidos
+    sesion.commit()
