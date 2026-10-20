@@ -16,6 +16,11 @@ class ConfiguracionAuth(BaseSettings):
     # las pruebas usan 4 (el mínimo) para no tardar minutos.
     rondas_bcrypt: int = 12
 
+    # Admin que se crea al arrancar si todavía no existe ninguno (ver servicios/admin_inicial.py).
+    # Sin él no habría forma de entrar: solo un admin puede crear usuarios.
+    admin_inicial_usuario: str | None = None
+    admin_inicial_contrasena: str | None = None
+
 
 @lru_cache
 def obtener_configuracion() -> ConfiguracionAuth:

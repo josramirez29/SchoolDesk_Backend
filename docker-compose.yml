@@ -41,6 +41,9 @@ services:
       CLAVE_JWT: ${CLAVE_JWT:?Falta CLAVE_JWT en .env}
       CLAVE_INTERNA: ${CLAVE_INTERNA:?Falta CLAVE_INTERNA en .env}
       URL_BASE_DATOS: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/auth_db
+      # Se crea al arrancar solo si todavía no existe ningún admin.
+      ADMIN_INICIAL_USUARIO: ${ADMIN_INICIAL_USUARIO:?Falta ADMIN_INICIAL_USUARIO en .env}
+      ADMIN_INICIAL_CONTRASENA: ${ADMIN_INICIAL_CONTRASENA:?Falta ADMIN_INICIAL_CONTRASENA en .env}
     depends_on:
       postgres:
         condition: service_healthy  # no arranca hasta que PostgreSQL acepte conexiones
