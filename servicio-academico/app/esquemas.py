@@ -165,3 +165,18 @@ class MisCalificaciones(BaseModel):
     materia: MateriaResumen
     promedio: DecimalJson | None
     categorias: list[MiCategoria]
+
+
+# --- Importación por CSV ---
+# Las filas de alumnos.csv y materias.csv se validan con los mismos esquemas que
+# el alta manual (AlumnoNuevo y MateriaNueva): las reglas no pueden diferir.
+
+
+class FilaInscripcion(BaseModel):
+    nrc: Nrc
+    matricula: Identificador
+
+
+COLUMNAS_ALUMNOS = list(AlumnoNuevo.model_fields)
+COLUMNAS_MATERIAS = list(MateriaNueva.model_fields)
+COLUMNAS_INSCRIPCIONES = list(FilaInscripcion.model_fields)

@@ -11,6 +11,7 @@ from schooldesk_comun.errores import ErrorApp
 class ClienteAuthFalso(ClienteAuth):
     def __init__(self) -> None:  # no llama a super(): no necesita conexión HTTP
         self.cuentas_creadas: list[CuentaAlumno] = []
+        self.llamadas_a_crear_cuentas = 0
         self.nombres_actualizados: list[tuple[str, str, str]] = []
         self.error: ErrorApp | None = None  # si se asigna, cada llamada lo lanza
         # Los docentes de datos-ejemplo/docentes.csv que usan las pruebas.
@@ -20,6 +21,7 @@ class ClienteAuthFalso(ClienteAuth):
         ]
 
     def crear_cuentas_alumnos(self, cuentas: list[CuentaAlumno]) -> ResultadoLote:
+        self.llamadas_a_crear_cuentas += 1
         self._fallar_si_se_pidio()
         self.cuentas_creadas.extend(cuentas)
         return ResultadoLote(creados=[cuenta.usuario for cuenta in cuentas], omitidos=[])
