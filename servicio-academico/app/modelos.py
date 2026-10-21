@@ -14,6 +14,7 @@ from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Numeric, String, U
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.base_datos import Base
+from schooldesk_comun.tipos import COLACION_ESPANOL
 
 
 def ahora_utc() -> datetime:
@@ -30,8 +31,8 @@ class Alumno(Base):
     __tablename__ = "alumnos"
 
     matricula: Mapped[str] = mapped_column(String(9), primary_key=True)
-    nombre: Mapped[str] = mapped_column(String(100))
-    apellidos: Mapped[str] = mapped_column(String(100))
+    nombre: Mapped[str] = mapped_column(String(100, collation=COLACION_ESPANOL))
+    apellidos: Mapped[str] = mapped_column(String(100, collation=COLACION_ESPANOL))
     creado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=ahora_utc)
 
     inscripciones: Mapped[list["Inscripcion"]] = relationship(back_populates="alumno")
@@ -48,7 +49,7 @@ class Materia(Base):
 
     nrc: Mapped[str] = mapped_column(String(5), primary_key=True)
     clave: Mapped[str] = mapped_column(String(10))  # p. ej. "ITIS 702"
-    nombre: Mapped[str] = mapped_column(String(100))
+    nombre: Mapped[str] = mapped_column(String(100, collation=COLACION_ESPANOL))
     seccion: Mapped[str] = mapped_column(String(3))  # p. ej. "001"
     # Docente titular. El nombre se copia al asignarlo, para que el alumno
     # vea quién le da clase sin tener permiso de consultar a auth.

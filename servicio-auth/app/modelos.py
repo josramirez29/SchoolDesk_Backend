@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.base_datos import Base
 from schooldesk_comun.roles import Rol
+from schooldesk_comun.tipos import COLACION_ESPANOL
 
 
 def ahora_utc() -> datetime:
@@ -23,8 +24,8 @@ class Usuario(Base):
     __tablename__ = "usuarios"
 
     usuario: Mapped[str] = mapped_column(String(9), primary_key=True)
-    nombre: Mapped[str] = mapped_column(String(100))
-    apellidos: Mapped[str] = mapped_column(String(100))
+    nombre: Mapped[str] = mapped_column(String(100, collation=COLACION_ESPANOL))
+    apellidos: Mapped[str] = mapped_column(String(100, collation=COLACION_ESPANOL))
     email: Mapped[str] = mapped_column(String(254), unique=True)
     hash_contrasena: Mapped[str] = mapped_column(String(60))  # bcrypt siempre mide 60
     rol: Mapped[Rol] = mapped_column(Enum(Rol, native_enum=False, length=10))

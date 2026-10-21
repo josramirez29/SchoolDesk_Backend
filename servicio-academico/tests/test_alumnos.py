@@ -95,6 +95,27 @@ def test_buscar_por_nombre_parcial_o_por_matricula(cliente: TestClient, sesion: 
     assert [a["apellidos"] for a in todos.json()] == ["Acosta Bravo", "Aguilar Campos"]
 
 
+def test_la_lista_se_ordena_como_en_espanol(cliente: TestClient, sesion: Session) -> None:
+    # Por bytes, "Márquez" y "Ñeco" quedarían al final; con la colación es-MX no.
+    for matricula, apellidos in [
+        ("202200001", "Ñeco Ruiz"),
+        ("202200002", "Molina Paz"),
+        ("202200003", "Nava Ortiz"),
+        ("202200004", "Márquez Gil"),
+    ]:
+        sesion.add(nuevo_alumno(matricula=matricula, apellidos=apellidos))
+    sesion.commit()
+
+    respuesta = cliente.get("/alumnos", headers=ADMIN)
+
+    assert [a["apellidos"] for a in respuesta.json()] == [
+        "Márquez Gil",
+        "Molina Paz",
+        "Nava Ortiz",
+        "Ñeco Ruiz",
+    ]
+
+
 def test_editar_el_nombre_lo_sincroniza_con_auth(
     cliente: TestClient, sesion: Session, auth_falso: ClienteAuthFalso
 ) -> None:

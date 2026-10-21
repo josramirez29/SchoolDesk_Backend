@@ -103,13 +103,13 @@ detiene todo y además borra los datos.
 
 ## Pruebas
 
-Son 233 pruebas con pytest, contra PostgreSQL y Redis reales en contenedores
+Son 234 pruebas con pytest, contra PostgreSQL y Redis reales en contenedores
 temporales (testcontainers). Las llamadas a otros servicios se reemplazan por
 clientes falsos inyectados.
 
 - comun: 26
 - servicio-auth: 47
-- servicio-academico: 97
+- servicio-academico: 98
 - servicio-asistencia: 47
 - gateway: 16
 
